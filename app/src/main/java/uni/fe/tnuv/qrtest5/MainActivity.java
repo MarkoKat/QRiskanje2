@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     //komentar za testirat github
     //Markotov komentar
+    //branch test
     private static final String TAG = "MainActivity";
     TextView barcodeResult;
     @Override
