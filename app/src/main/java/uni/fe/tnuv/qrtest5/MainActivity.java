@@ -17,6 +17,7 @@ import com.google.zxing.integration.android.IntentResult;
 public class MainActivity extends AppCompatActivity {
 
     //komentar za testirat github
+    //Markotov komentar
     private static final String TAG = "MainActivity";
     TextView barcodeResult;
     @Override
