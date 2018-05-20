@@ -2,9 +2,13 @@ package uni.fe.tnuv.qrtest5;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
@@ -75,6 +79,13 @@ public class ResultActivity extends AppCompatActivity {
         if(ok == 0) {
             textView.setText("QR koda ni veljavna!");
         }
+
+        //Prikaz zelene kljukice
+        ImageView myImageView = (ImageView) findViewById(R.id.imgview);
+        Bitmap myBitmap = BitmapFactory.decodeResource(
+                getApplicationContext().getResources(),
+                R.drawable.klj2);
+        myImageView.setImageBitmap(myBitmap);
     }
 
     //Za shranjevanje v datotečni sistem------------------------------------------------------------
@@ -109,5 +120,11 @@ public class ResultActivity extends AppCompatActivity {
         String vsebina = new String(bytes);
 
         return vsebina;
+    }
+
+    public void showList(View v) {
+        Intent intent = new Intent(this, MainActivity.class);
+        //intent.putExtra("barcode", barcode);
+        startActivity(intent);
     }
 }

@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         String[][] tabelaUser = {
                 {"123456", "0"},
                 {"111111", "0"},
-                {"000001", "1"}
+                {"000001", "0"}
         };
 
         String tabelaUser2;
