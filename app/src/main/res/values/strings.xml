@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">QRtest5</string>
+    <string name="datotekaZVsebino">podatki.txt</string>
+    <string name="datotekaZVsebinoUser">user.txt</string>
 </resources>
