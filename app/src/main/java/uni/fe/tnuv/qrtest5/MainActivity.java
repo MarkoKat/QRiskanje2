@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
     //Markotov komentar
     //branch test n
     private static final String TAG = "MainActivity";
-    private String filename;
-    private String filenameUser;
+    private String filename; //za lokalno shranjevanje podatkov o lokacijah
+    private String filenameUser; //za shranjevanje podatkov o že najdenih QR kodah
     TextView barcodeResult;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +37,14 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
+        DatotecniSistem datotecni = new DatotecniSistem();
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
 
         barcodeResult = (TextView)findViewById(R.id.barcode_result2);
         barcodeResult.setText("Tu bo prikazan rezultat");
 
+        //samo zacasni tabeli
         String[][] tabela = {
                 {"123456", "Fakulteta za elektrotehniko", "Namig, ki ga ni, ali pa ga samo ne vidiš", "46.044783", "14.489494"},
                 {"111111", "Prešernov spomenik", "Tudi tu ni namioga", "46.051389", "14.506317"},
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         String tabelaUser2;
 
+        //Pretvarjanje tabele v en String
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < tabela.length; i++) {
             StringBuilder tmp = new StringBuilder();
@@ -64,9 +67,11 @@ public class MainActivity extends AppCompatActivity {
             }
             sb.append(tmp).append("%");
         }
-        //Log.i(TAG,sb.toString());
-        vpisiVDatoteko(filename, sb.toString());
 
+
+        datotecni.vpisiVDatoteko(filename, sb.toString());
+
+        //Pretvarjanje enega stringa v tabelo
         String tabela2 = beriIzDatoteke(filename);
         String[] tabela3 = tabela2.split("%");
         String[][] tabela4 = new String[tabela3.length][5];
@@ -76,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
             tabela4[i] = tabelaTMP;
         }
 
+        //Ugotavljanje prvega zagona aplikacije
         final String PREFS_NAME = "MyPrefsFile";
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -109,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         barcodeResult.setText(tabelaUser2);
     }
 
+    //Zagon Qr scannerja
     public void scanBarcode(View v) {
         //Intent intent = new Intent(this, ScanBarcodeActivity.class);
         //startActivityForResult(intent, 0);
