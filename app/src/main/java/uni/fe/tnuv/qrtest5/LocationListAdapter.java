@@ -11,20 +11,17 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+
 
 
 public class LocationListAdapter extends ArrayAdapter<LocationInfo>{
     private static final String TAG = "LocationListAdapter";
 
     private Context mContext;
-    private int mResource;
 
     public LocationListAdapter( Context context, int resource, ArrayList<LocationInfo> objects) {
         super(context, resource, objects);
         this.mContext = context;
-        this.mResource = resource;
     }
 
     @NonNull
@@ -35,7 +32,7 @@ public class LocationListAdapter extends ArrayAdapter<LocationInfo>{
         String opis = getItem(position).getOpis();
         float lat = getItem(position).getLat();
         float lng = getItem(position).getLng();
-        // za dobit razdaljo
+        // za dobit razdaljo, trenutno je karnekej
         double dist = 1 + Math.random() * (999 - 1);
         //double dist = getItem(position).getDist();
 
@@ -61,7 +58,6 @@ public class LocationListAdapter extends ArrayAdapter<LocationInfo>{
         tvDist.setText(Double.toString(dist));
 
         return convertView;
-
 
     }
 }

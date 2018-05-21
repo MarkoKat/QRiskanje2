@@ -51,10 +51,7 @@ public class AddLocationActivity extends AppCompatActivity {
 
         // Write a message to the database
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        /*FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-
-        myRef.setValue("Hello, World!");*/
+        
         ime = (EditText) findViewById(R.id.ime);
         opis = (EditText) findViewById(R.id.opis);
         lat = (EditText) findViewById(R.id.lat);
@@ -77,14 +74,12 @@ public class AddLocationActivity extends AppCompatActivity {
 
     public void poslji(View view){
 
-        //String idLok = new Integer(idL).toString();
-
         // naredi naključek string dolg MAX_LENGTH = 20
         Random r = new Random();
 
         String alphabet = "12345678901234567890abcdefghijklmnoprqstuvzxywABCDEFGHIJKLMNOPRQSTUVZXYW";
         String randomString = "";
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < MAX_LENGTH; i++) {
             randomString += alphabet.charAt(r.nextInt(alphabet.length()));
         }
         idL = randomString;

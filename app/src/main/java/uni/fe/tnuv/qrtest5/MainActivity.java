@@ -57,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
 
         // za bazo
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        // Add value event listener to the post
-        // [START post_value_event_listener]
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -78,35 +76,28 @@ public class MainActivity extends AppCompatActivity {
                 }
                 allLocations = currLocationsList;
                 saveLocations();
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 // Getting Post failed, log a message
                 Log.w("napaka", "loadPost:onCancelled", databaseError.toException());
-                // [START_EXCLUDE]
                 Context context = getApplicationContext();
                 Toast.makeText(context, "napaka", Toast.LENGTH_SHORT).show();
-                // [END_EXCLUDE]
             }
         };
         mDatabase.addValueEventListener(postListener);
 
-
-        // izpis iz shared Preferences v seznam
-
-        /*ListView  mListView = (ListView) findViewById(R.id.list_view);
-        LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, allLocations);
-        mListView.setAdapter(adapter);*/
-        final Context thisContext = this;
-
+        // refresh od swipanju
         container = (SwipeRefreshLayout) findViewById(R.id.container);
         container.setOnRefreshListener(mOnRefreshListener);
+
+        // izpis iz shared Preferences v seznam
         updateLocationList();
 
     }
 
+    // refresh od swipanju
     protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
@@ -114,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    // ko swipas updata list 
+    // ko swipas updata list
     public void updateLocationList(){
         ListView  mListView = (ListView) findViewById(R.id.list_view);
         LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, allLocations);
@@ -222,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
 
         editor.remove("locationList");
         editor.commit();
-        //editor.clear().commit();
 
         editor.putString("locationList", json);
         editor.apply();
