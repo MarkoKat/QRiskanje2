@@ -3,11 +3,15 @@ package uni.fe.tnuv.qrtest5;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -23,9 +27,11 @@ import java.io.FileInputStream;
 public class DetailActivity extends AppCompatActivity {
 
     private FusedLocationProviderClient mFusedLocationClient;
+    public static String[][] tabelaUser;
 
     public static String[][] tabela;
     private String filename;
+    private String filenameUser;
 
     public int trenutnaKoda;
 
@@ -35,6 +41,8 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         filename = getResources().getString(R.string.datotekaZVsebino);
+        filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
+
         //Branje lokacij iz datotecnega sistema
         String tabela2 = beriIzDatoteke(filename);
         //Log.i(TAG,tabela2);
@@ -47,21 +55,41 @@ public class DetailActivity extends AppCompatActivity {
         }
         tabela = tabela4;
 
+        String tabelaUser2 = beriIzDatoteke(filenameUser);
+        String[] tabelaUser3 = tabelaUser2.split("%");
+        String[][] tabelaUser4 = new String[tabelaUser3.length][2];
+        for (int i = 0; i < tabelaUser3.length; i++) {
+            String[] tabelaUserTMP = tabelaUser3[i].split("#");
+            tabelaUser4[i] = tabelaUserTMP;
+        }
+        tabelaUser = tabelaUser4;
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         Intent intent = getIntent();
         String message = intent.getStringExtra("ime_lokacije");
 
         TextView textView = findViewById(R.id.textView_ime_lokacije);
-        textView.setText(message);
+
+
 
         TextView textView2 = findViewById(R.id.textView_namig);
+        TextView textViewId = findViewById(R.id.textView_id);
         int ok = 0;
         for(int i = 0; i < tabela.length; i++){
             if(message.equals(tabela[i][1])){
                 textView2.setText(tabela[i][2]);
+                textViewId.setText("ID: " + tabela[i][0]);
                 ok = 1;
                 trenutnaKoda = i;
+                if(tabelaUser[i][1].equals("1")) {
+                    int unicode = 0x2714;
+                    textView.setText(getEmojiByUnicode(unicode) + " " +  message);
+                    textView.setTextColor(Color.parseColor("#00a813"));
+                }
+                else {
+                    textView.setText(message);
+                }
             }
         }
         if(ok == 0) {
@@ -132,5 +160,9 @@ public class DetailActivity extends AppCompatActivity {
         String vsebina = new String(bytes);
 
         return vsebina;
+    }
+
+    public String getEmojiByUnicode(int unicode){
+        return new String(Character.toChars(unicode));
     }
 }

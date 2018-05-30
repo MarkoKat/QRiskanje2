@@ -63,29 +63,54 @@ public class ResultActivity extends AppCompatActivity {
         for(int i = 0; i < tabela.length; i++){
             if(message.equals(tabela[i][0])){
                 textView.setText(tabela[i][1]);
-                ok = 1;
-                tabelaUser[i][1] = "1";
-                StringBuilder sbUser = new StringBuilder();
-                for (int i2 = 0; i2 < tabelaUser.length; i2++) {
-                    StringBuilder tmpUser = new StringBuilder();
-                    for (int j2 = 0; j2 < tabelaUser[i2].length; j2++) {
-                        tmpUser.append(tabelaUser[i2][j2]).append("#");
-                    }
-                    sbUser.append(tmpUser).append("%");
+
+                if (tabelaUser[i][1].equals("1")) {
+                    ok = 2;
                 }
-                vpisiVDatoteko(filenameUser, sbUser.toString());
+                else {
+                    ok = 1;
+                    tabelaUser[i][1] = "1";
+                    StringBuilder sbUser = new StringBuilder();
+                    for (int i2 = 0; i2 < tabelaUser.length; i2++) {
+                        StringBuilder tmpUser = new StringBuilder();
+                        for (int j2 = 0; j2 < tabelaUser[i2].length; j2++) {
+                            tmpUser.append(tabelaUser[i2][j2]).append("#");
+                        }
+                        sbUser.append(tmpUser).append("%");
+                    }
+                    vpisiVDatoteko(filenameUser, sbUser.toString());
+                }
+
             }
         }
         if(ok == 0) {
             textView.setText("QR koda ni veljavna!");
         }
 
-        //Prikaz zelene kljukice
+        //Prikaz ikone
         ImageView myImageView = (ImageView) findViewById(R.id.imgview);
-        Bitmap myBitmap = BitmapFactory.decodeResource(
-                getApplicationContext().getResources(),
-                R.drawable.klj2);
-        myImageView.setImageBitmap(myBitmap);
+        TextView razlaga = (TextView) findViewById(R.id.textView_razlaga);
+        if(ok == 1) {
+            Bitmap myBitmap = BitmapFactory.decodeResource(
+                    getApplicationContext().getResources(),
+                    R.drawable.klj2);
+            myImageView.setImageBitmap(myBitmap);
+            razlaga.setText("Našli ste QR kodo na lokaciji:");
+        }
+        else if (ok == 2) {
+            Bitmap myBitmap = BitmapFactory.decodeResource(
+                    getApplicationContext().getResources(),
+                    R.drawable.zenajdeno);
+            myImageView.setImageBitmap(myBitmap);
+            razlaga.setText("To QR kodo ste že našli");
+        }
+        else {
+            Bitmap myBitmap = BitmapFactory.decodeResource(
+                    getApplicationContext().getResources(),
+                    R.drawable.napacna2);
+            myImageView.setImageBitmap(myBitmap);
+        }
+
     }
 
     //Za shranjevanje v datotečni sistem------------------------------------------------------------
