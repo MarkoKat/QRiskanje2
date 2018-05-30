@@ -188,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         integrator.setBarcodeImageEnabled(false);
         integrator.initiateScan();
     }
-    /*
+    /* Nacin za QR ki se trenutno ne uporablja
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode==0) {
