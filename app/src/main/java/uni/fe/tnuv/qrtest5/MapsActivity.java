@@ -60,7 +60,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
 
         //Branje lokacij iz datotecnega sistema
         String tabela2 = beriIzDatoteke(filename);
-        Log.i(TAG,tabela2);
+        Log.i(TAG, "Marko123" + tabela2);
         String[] tabela3 = tabela2.split("%");
         String[][] tabela4 = new String[tabela3.length][5];
         //List<String> tabela4 = new ArrayList<String>();
@@ -69,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             tabela4[i] = tabelaTMP;
         }
         tabela = tabela4;
+        //Log.i(TAG, "Marko123" + tabela[3][0]);
 
         String tabelaUser2 = beriIzDatoteke(filenameUser);
         String[] tabelaUser3 = tabelaUser2.split("%");
@@ -143,6 +144,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         }
 
         for(int i = 0; i < tabela.length; i++) {
+
             if(tabelaUser[i][1].equals("1")) {
                 Marker newmarker = map.addMarker(new MarkerOptions()
                         .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
@@ -157,6 +159,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                 newmarker.setTag(0);
             }
+
 
         }
 
