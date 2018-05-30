@@ -37,7 +37,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDvItnYo6KFdAgP6V2temCUnJmvLmLUx5U" />
 
-        <activity android:name=".DetailActivity"></activity>
+        <activity android:name=".DetailActivity" />
+        <activity android:name=".AddLocationActivity"></activity>
     </application>
 
 </manifest>

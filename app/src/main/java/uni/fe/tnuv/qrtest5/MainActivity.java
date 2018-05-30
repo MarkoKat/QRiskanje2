@@ -4,15 +4,27 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -22,15 +34,28 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
     //komentar za testirat github
     //Markotov komentar
     //branch test n
+    private DatabaseReference mDatabase;
+    private ArrayList<LocationInfo> allLocations;
     private static final String TAG = "MainActivity";
     private String filename; //za lokalno shranjevanje podatkov o lokacijah
     private String filenameUser; //za shranjevanje podatkov o že najdenih QR kodah
     TextView barcodeResult;
+
+    private SwipeRefreshLayout container;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +127,90 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, sbUser.toString());
             vpisiVDatoteko(filenameUser, sbUser.toString());
             tabelaUser2 = beriIzDatoteke(filenameUser);
+
+        //prebere podatke v allLocations iz sharedPreferences
+        loadLocations();
+
+        // za bazo
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // se klice pri vsaki spremembi v bazi
+                ArrayList<LocationInfo> currLocationsList = new ArrayList<>();
+                for (DataSnapshot postSnapshot:  dataSnapshot.getChildren()){
+                    for (DataSnapshot ds: postSnapshot.getChildren()){
+                        LocationInfo currentLoc = new LocationInfo();
+                        currentLoc.setIme(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getIme());
+                        currentLoc.setOpis(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getOpis());
+                        currentLoc.setLat(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getLat());
+                        currentLoc.setLng(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getLng());
+                        currentLoc.setuID(ds.getKey());
+
+                        currLocationsList.add(currentLoc);
+                    }
+                }
+                allLocations = currLocationsList;
+                saveLocations();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("napaka", "loadPost:onCancelled", databaseError.toException());
+                Context context = getApplicationContext();
+                Toast.makeText(context, "napaka", Toast.LENGTH_SHORT).show();
+            }
+        };
+        mDatabase.addValueEventListener(postListener);
+
+        // refresh od swipanju
+        container = (SwipeRefreshLayout) findViewById(R.id.container);
+        container.setOnRefreshListener(mOnRefreshListener);
+
+        // izpis iz shared Preferences v seznam
+        updateLocationList();
+
+    }
+
+    // refresh od swipanju
+    protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            updateLocationList();
+        }
+    };
+
+    // ko swipas updata list
+    public void updateLocationList(){
+        ListView  mListView = (ListView) findViewById(R.id.list_view);
+        LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, allLocations);
+        mListView.setAdapter(adapter);
+        if (container.isRefreshing()) {
+            container.setRefreshing(false);
+        }
+    }
+
+    // gumb plus v meniju v action bar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.add_button, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.action_add:
+                Intent intent = new Intent(this, AddLocationActivity.class);
+                //intent.putExtra("barcode", barcode);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
             // record the fact that the app has been started at least once
             settings.edit().putBoolean("my_first_time", false).commit();
@@ -216,5 +325,33 @@ public class MainActivity extends AppCompatActivity {
         String vsebina = new String(bytes);
 
         return vsebina;
+    }
+
+    // shrani lokacijo iz baze v sharedPreferences
+    private void saveLocations(){
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(allLocations);
+
+        editor.remove("locationList");
+        editor.commit();
+
+        editor.putString("locationList", json);
+        editor.apply();
+
+    }
+
+    // prebere podatke iz sharedPreferences in jih vrne v obliki ArrayList<LocationInfo>
+    private void loadLocations(){
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("locationList", null);
+        Type type = new TypeToken<ArrayList<LocationInfo>>() {}.getType();
+        allLocations = gson.fromJson(json, type);
+
+        if (allLocations == null){
+            allLocations = new ArrayList<>();
+        }
     }
 }

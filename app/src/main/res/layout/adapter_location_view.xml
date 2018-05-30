@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+    <TextView
+        android:gravity="center"
+        android:textAlignment="center"
+        android:text="Ime lokacije"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/location_name"
+        android:layout_weight="4"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="4">
+
+        <TextView
+            android:gravity="center"
+            android:text="Lat"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:id="@+id/location_lat"/>
+
+        <TextView
+            android:gravity="center"
+            android:text="Lng"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:id="@+id/location_lng"
+            android:layout_below="@+id/location_lat"/>
+    </LinearLayout>
+    <TextView
+        android:gravity="center"
+        android:textAlignment="center"
+        android:text="500m"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/location_distance"
+        android:layout_weight="6"/>
+
+
+</LinearLayout>
