@@ -11,24 +11,37 @@
         android:id="@+id/ime"
         android:hint="Ime"
         />
+
     <EditText
+        android:id="@+id/opis"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/opis"
+        android:ems="10"
         android:hint="Opis"
-        />
+        android:inputType="textMultiLine"
+        android:singleLine="false" />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lat"
-        android:hint="Zemljepisna širina"
+        android:hint="Zemljepisna širina (od -90° do +90°)"
+        android:inputType="numberDecimal|numberSigned"
         />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lng"
-        android:hint="Zemljepisna dolžina"
+        android:hint="Zemljepisna dolžina (od -180° do +180°)"
+        android:inputType="numberDecimal|numberSigned"
         />
+
+    <CheckBox
+        android:id="@+id/use_gps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="false"
+        android:text="Uporabi trenutno lokacijo" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,9 +50,16 @@
         android:layout_gravity="center"
         />
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:id="@+id/izpis"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="tukaj bo izpian id QR kode"
+        android:id="@+id/qr_code"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Prenesi QR KODO"
+        android:onClick="prenesiQr"
+        android:layout_gravity="center"
         />
 </LinearLayout>
