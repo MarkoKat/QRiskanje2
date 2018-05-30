@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     //komentar za testirat github
     //Markotov komentar
     //branch test n
+    //branch test d
     private DatabaseReference mDatabase;
     private ArrayList<LocationInfo> allLocations;
     private static final String TAG = "MainActivity";

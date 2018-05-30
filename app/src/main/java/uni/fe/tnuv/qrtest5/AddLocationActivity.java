@@ -51,7 +51,7 @@ public class AddLocationActivity extends AppCompatActivity {
 
         // Write a message to the database
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        
+
         ime = (EditText) findViewById(R.id.ime);
         opis = (EditText) findViewById(R.id.opis);
         lat = (EditText) findViewById(R.id.lat);
