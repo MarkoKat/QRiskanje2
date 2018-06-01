@@ -7,10 +7,39 @@
     tools:context="uni.fe.tnuv.qrtest5.MainActivity">
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/search_bar"
+        android:weightSum="10"
+        >
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Išči lokacijo"
+            android:id="@+id/search_input"
+            android:drawableLeft="@drawable/ic_search_grey_24dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            />
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/stop_search"
+            android:layout_weight="9"
+            android:background="@null"
+            android:src="@drawable/ic_clear_grey_24dp"
+            android:onClick="stopSearch"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/pick_list"
+        app:layout_constraintTop_toBottomOf="@id/search_bar"
         android:weightSum="2">
 
         <Button

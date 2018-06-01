@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -15,25 +14,26 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.vision.barcode.Barcode;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,14 +48,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -84,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton scanButton;
     private ImageButton mapButton;
 
+    private EditText searchInput;
+    private ImageButton stopSearchButton;
+
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 12;
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -109,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
         listButton = findViewById(R.id.button_list);
         scanButton = findViewById(R.id.scan_barcode);
         mapButton = findViewById(R.id.button_maps);
+
+        searchInput = findViewById(R.id.search_input);
+        stopSearchButton = findViewById(R.id.stop_search);
 
         // refresh od swipanju
         container = (SwipeRefreshLayout) findViewById(R.id.container);
@@ -309,6 +311,26 @@ public class MainActivity extends AppCompatActivity {
                     });
         }
 
+        searchInput.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                if (!allLocations.isEmpty() && allLocations != null) {
+                    updateLocationList();
+                }
+            }
+        });
+
 
         //izpis iz shared Preferences v seznam
         if (!allLocations.isEmpty() && allLocations != null) {
@@ -338,20 +360,41 @@ public class MainActivity extends AppCompatActivity {
             displayingLocations = foundLocations;
         }
 
+
+        // ce je kaj v searchinputu se naredi filter kar je notr
+        if (searchInput.getText().toString() != ""){
+            String filter = searchInput.getText().toString();
+            ArrayList<LocationInfo> filteredLocations = new ArrayList<>();
+            for (int i = 0; i < displayingLocations.size(); i++) {
+                if(displayingLocations.get(i).getIme().toLowerCase().contains(filter.toLowerCase())){
+                    filteredLocations.add(displayingLocations.get(i));
+                }
+            }
+            displayingLocations = filteredLocations;
+        }
+
+
         // ce je dobljena lokacija, lahko vsaki lokaciji dodamo se distance
         if (foundLastLoc){
-            for (int i = 0; i < allLocations.size(); i++) {
+            for (int i = 0; i < displayingLocations.size(); i++) {
                 Location loc1 = new Location("");
                 loc1.setLatitude(currLat);
                 loc1.setLongitude(currLng);
 
                 Location loc2 = new Location("");
-                loc2.setLatitude(allLocations.get(i).getLat());
-                loc2.setLongitude(allLocations.get(i).getLng());
+                loc2.setLatitude(displayingLocations.get(i).getLat());
+                loc2.setLongitude(displayingLocations.get(i).getLng());
 
                 float distanceInMeters = loc1.distanceTo(loc2);
-                allLocations.get(i).setDist(distanceInMeters);
+                displayingLocations.get(i).setDist(distanceInMeters);
             }
+
+            // razvrsti po razdalji od najmanjse do najvecje
+            Collections.sort(displayingLocations, new LocationDistanceComparator());
+        }
+        else{
+            // ce ni lokacije razvrsti po imenu
+            Collections.sort(displayingLocations, new LocationNameComparator());
         }
 
         ListView  mListView = (ListView) findViewById(R.id.list_view);
@@ -373,10 +416,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // gumb plus v meniju v action bar
+    // gumba plus in search v meniju v action bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.add_button, menu);
+        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -389,6 +432,12 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, AddLocationActivity.class);
                 //intent.putExtra("barcode", barcode);
                 startActivity(intent);
+                return true;
+            case R.id.action_search:
+                if (searchInput.getVisibility() != View.VISIBLE) {
+                    searchInput.setVisibility(View.VISIBLE);
+                    stopSearchButton.setVisibility(View.VISIBLE);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -554,6 +603,14 @@ public class MainActivity extends AppCompatActivity {
         listFoundLocations.setClickable(false);
         listFoundLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         listAllLocations.setBackgroundColor(Color.GRAY);
+    }
+
+    // nastavi search bar na "gone"
+    public void stopSearch(View view){
+        searchInput.setVisibility(View.GONE);
+        stopSearchButton.setVisibility(View.GONE);
+
+        searchInput.setText("");
     }
 
     @Override
