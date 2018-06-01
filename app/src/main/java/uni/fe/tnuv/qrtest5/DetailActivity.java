@@ -1,12 +1,14 @@
 package uni.fe.tnuv.qrtest5;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -97,48 +99,62 @@ public class DetailActivity extends AppCompatActivity {
         }
 
 
+        LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted
+            TextView textViewOddaljenost = findViewById(R.id.textView_oddaljenost);
+            textViewOddaljenost.setText("Za prikaz razdalje morate omogočiti lokacijske storitve");
         }
         else{
+            if (gps_enabled == true) {
+                mFusedLocationClient.getLastLocation()
+                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
+                                // Got last known location. In some rare situations this can be null.
+                                if (location != null) {
 
-            mFusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            // Got last known location. In some rare situations this can be null.
-                            if (location != null) {
+                                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                    Double latitude = location.getLatitude();
+                                    Double longitude = location.getLongitude();
 
-                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                Double latitude = location.getLatitude();
-                                Double longitude = location.getLongitude();
+                                    Location loc1 = new Location("");
+                                    loc1.setLatitude(latitude);
+                                    loc1.setLongitude(longitude);
 
-                                Location loc1 = new Location("");
-                                loc1.setLatitude(latitude);
-                                loc1.setLongitude(longitude);
+                                    Location loc2 = new Location("");
+                                    loc2.setLatitude(Double.parseDouble(tabela[trenutnaKoda][3]));
+                                    loc2.setLongitude(Double.parseDouble(tabela[trenutnaKoda][4]));
 
-                                Location loc2 = new Location("");
-                                loc2.setLatitude(Double.parseDouble(tabela[trenutnaKoda][3]));
-                                loc2.setLongitude(Double.parseDouble(tabela[trenutnaKoda][4]));
+                                    float distanceInMeters = loc1.distanceTo(loc2);
 
-                                float distanceInMeters = loc1.distanceTo(loc2);
+                                    String urejenaRazdalja = "bs";
 
-                                String urejenaRazdalja = "bs";
+                                    if (distanceInMeters > 1000) {
+                                        float distance2 = distanceInMeters / 1000;
+                                        urejenaRazdalja = (double) Math.round(distance2 * 10d) / 10d + "km";
+                                    } else {
+                                        urejenaRazdalja = Math.round(distanceInMeters) + "m";
+                                    }
 
-                                if(distanceInMeters > 1000) {
-                                    float distance2 = distanceInMeters / 1000;
-                                    urejenaRazdalja = (double)Math.round(distance2 * 10d) / 10d + "km";
+                                    TextView textViewOddaljenost = findViewById(R.id.textView_oddaljenost);
+                                    textViewOddaljenost.setText("Razdalja: " + urejenaRazdalja);
                                 }
-                                else {
-                                    urejenaRazdalja = Math.round(distanceInMeters) + "m";
-                                }
-
-                                TextView textViewOddaljenost = findViewById(R.id.textView_oddaljenost);
-                                textViewOddaljenost.setText("Razdalja: " + urejenaRazdalja);
                             }
-                        }
-                    });
+                        });
+            }
+            else {
+                TextView textViewOddaljenost = findViewById(R.id.textView_oddaljenost);
+                textViewOddaljenost.setText("Za prikaz razdalje morate omogočiti lokacijske storitve");
+            }
         }
     }
 

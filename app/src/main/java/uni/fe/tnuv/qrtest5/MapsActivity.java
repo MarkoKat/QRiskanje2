@@ -143,25 +143,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
 
         }
 
-        for(int i = 0; i < tabela.length; i++) {
-
-            if(tabelaUser[i][1].equals("1")) {
-                Marker newmarker = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
-                        .title(tabela[i][1])
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                newmarker.setTag(0);
-            }
-            else {
-                Marker newmarker = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
-                        .title(tabela[i][1])
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                newmarker.setTag(0);
-            }
-
-
-        }
+        postaviMarkerje();
 
         //mMap.setOnMarkerClickListener(this);
 
@@ -271,9 +253,15 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
                 }
                 return;
             }
@@ -301,5 +289,25 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         String vsebina = new String(bytes);
 
         return vsebina;
+    }
+
+    private void postaviMarkerje() {
+        for(int i = 0; i < tabela.length; i++) {
+
+            if(tabelaUser[i][1].equals("1")) {
+                Marker newmarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
+                        .title(tabela[i][1])
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                newmarker.setTag(0);
+            }
+            else {
+                Marker newmarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
+                        .title(tabela[i][1])
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                newmarker.setTag(0);
+            }
+        }
     }
 }
