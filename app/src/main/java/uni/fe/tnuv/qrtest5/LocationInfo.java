@@ -7,7 +7,7 @@ public class LocationInfo {
     public String opis;
     public float lat;
     public float lng;
-
+    public float dist = -1;
     /*public LocationInfo() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }*/
@@ -53,7 +53,11 @@ public class LocationInfo {
         this.uID = uID;
     }
 
-    public String getAll(){
-        return this.uID+" - "+this.ime+" - "+this.opis+" - "+this.lat+" - "+this.lng;
+    public void setDist(float dist) {
+        this.dist = dist;
+    }
+
+    public float getDist(){
+        return this.dist;
     }
 }

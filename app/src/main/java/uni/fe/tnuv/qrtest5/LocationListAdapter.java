@@ -32,8 +32,21 @@ public class LocationListAdapter extends ArrayAdapter<LocationInfo>{
         String opis = getItem(position).getOpis();
         float lat = getItem(position).getLat();
         float lng = getItem(position).getLng();
+        float dist = getItem(position).getDist();
         // za dobit razdaljo, trenutno je karnekej
-        double dist = 1 + Math.random() * (999 - 1);
+
+        String urejenaRazdalja = "";
+        if (dist >= 0){
+            if(dist > 1000) {
+                float distance2 = dist / 1000;
+                urejenaRazdalja = (double)Math.round(distance2 * 10d) / 10d + "km";
+            }
+            else {
+                urejenaRazdalja = Math.round(dist) + "m";
+            }
+        }
+
+        //double dist = 1 + Math.random() * (999 - 1);
         //double dist = getItem(position).getDist();
 
         LocationInfo location = new LocationInfo();
@@ -55,7 +68,7 @@ public class LocationListAdapter extends ArrayAdapter<LocationInfo>{
         tvName.setText(ime);
         tvLat.setText(Float.toString(lat));
         tvLng.setText(Float.toString(lng));
-        tvDist.setText(Double.toString(dist));
+        tvDist.setText(urejenaRazdalja);
 
         return convertView;
 
