@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.location.Location;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +14,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,9 +56,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private String filename; //za lokalno shranjevanje podatkov o lokacijah
     private String filenameUser; //za shranjevanje podatkov o že najdenih QR kodah
-    TextView barcodeResult;
+    private TextView info;
 
     private SwipeRefreshLayout container;
+
+    private Button listAllLocations;
+    private ArrayList<LocationInfo> toBeFoundLocations;
+    private Button listFoundLocations;
+    private ArrayList<LocationInfo> foundLocations;
+
+    private Boolean displayingAllLocations = true;
+    private ArrayList<LocationInfo> displayingLocations;
 
 
     @Override
@@ -67,8 +79,9 @@ public class MainActivity extends AppCompatActivity {
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
 
-        barcodeResult = (TextView)findViewById(R.id.barcode_result2);
-        barcodeResult.setText("Tu bo prikazan rezultat");
+        info = findViewById(R.id.info);
+        listAllLocations = findViewById(R.id.all_locations);
+        listFoundLocations = findViewById(R.id.found_locations);
 
         //samo zacasni tabeli
         String[][] tabela = {
@@ -218,6 +231,13 @@ public class MainActivity extends AppCompatActivity {
                 allLocations = currLocationsList;
                 saveLocations();
 
+                /** TUKAJ DODAJ DELITEV V ISKANE IN ZE NAJDENE LOKACIJE*/
+
+                toBeFoundLocations = allLocations;
+                // se prikaze samo prva lokacija v seznamu trenutno
+                foundLocations.add(allLocations.get(0));
+
+
 
             }
 
@@ -249,9 +269,26 @@ public class MainActivity extends AppCompatActivity {
 
     // ko swipas updata list
     public void updateLocationList(){
+        if(displayingAllLocations = true){
+            displayingLocations = toBeFoundLocations;
+        }
+        else{
+            displayingLocations = foundLocations;
+        }
+
         ListView  mListView = (ListView) findViewById(R.id.list_view);
-        LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, allLocations);
+        LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, displayingLocations);
         mListView.setAdapter(adapter);
+        // OnClick na item na seznamu prikaze podrobnosti za lokacijo
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Pridobimo lokacijo iz ArrayList na katero je uporabnik pritisnil
+                LocationInfo selectedLocation = (LocationInfo) parent.getItemAtPosition(position);
+                prikaziPodrobnosti(selectedLocation.getIme());
+            }
+        });
+        // da izgine ikonca za osvezevanje
         if (container.isRefreshing()) {
             container.setRefreshing(false);
         }
@@ -294,33 +331,6 @@ public class MainActivity extends AppCompatActivity {
         integrator.setBarcodeImageEnabled(false);
         integrator.initiateScan();
     }
-
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==0) {
-            if(resultCode == CommonStatusCodes.SUCCESS) {
-                if(data!=null) {
-                    Barcode barcode = data.getParcelableExtra("barcode");
-                    Intent intent = new Intent(this, ResultActivity.class);
-                    intent.putExtra("barcode", barcode.displayValue);
-                    startActivity(intent);
-
-                    /*Barcode barcode = data.getParcelableExtra("barcode");
-                    Log.i(TAG, "Koda2: " + barcode.displayValue);
-                    barcodeResult.setText(barcode.displayValue);*/
-                /*}
-                else {
-                    barcodeResult.setText("QR koda ni bila najdena");
-                }
-            }
-        }
-        else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-
-    }
-    */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -407,5 +417,37 @@ public class MainActivity extends AppCompatActivity {
         if (allLocations == null){
             allLocations = new ArrayList<>();
         }
+        else{
+            /** TUKAJ DODAJ DELITEV V ISKANE IN ZE NAJDENE LOKACIJE*/
+            toBeFoundLocations = allLocations;
+            // se prikaze samo prva lokacija v seznamu trenutno
+            foundLocations = allLocations;
+        }
+    }
+
+    public void prikaziPodrobnosti(String imeLokacije) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("ime_lokacije", imeLokacije);
+        startActivity(intent);
+    }
+
+    // Prikaze seznam vseh se ne najdenih lokacij
+    public void displayAllLocations(View view){
+        displayingAllLocations = true;
+        updateLocationList();
+        listAllLocations.setClickable(false);
+        listFoundLocations.setClickable(true);
+        listAllLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        listFoundLocations.setBackgroundColor(Color.GRAY);
+    }
+
+    // Prikaze seznam ze najdenih lokacij
+    public void displayFoundLocations(View view){
+        displayingAllLocations = false;
+        updateLocationList();
+        listAllLocations.setClickable(true);
+        listFoundLocations.setClickable(false);
+        listFoundLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+        listAllLocations.setBackgroundColor(Color.GRAY);
     }
 }

@@ -16,10 +16,11 @@
         android:id="@+id/opis"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10"
         android:hint="Opis"
         android:inputType="textMultiLine"
-        android:singleLine="false" />
+        android:singleLine="false"
+        android:maxLines="5"
+        android:gravity="top"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,14 +53,18 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="tukaj bo izpian id QR kode"
+        android:text="tukaj bo izpisan id QR kode"
         android:id="@+id/qr_code"
+        android:visibility="invisible"
         />
     <Button
+        android:id="@+id/download_qr_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Prenesi QR KODO"
         android:onClick="prenesiQr"
         android:layout_gravity="center"
+        android:visibility="invisible"
+        android:clickable="false"
         />
 </LinearLayout>

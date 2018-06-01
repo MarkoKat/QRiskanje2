@@ -3,10 +3,12 @@ package uni.fe.tnuv.qrtest5;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -65,8 +68,9 @@ public class AddLocationActivity extends AppCompatActivity {
     private EditText lngET;
     private CheckBox manualGps;
     private TextView qrCode;
+    private Button downloadQr;
 
-    private String idL;
+    private String uID;
     private Double currLat;
     private Double currLng;
 
@@ -90,12 +94,13 @@ public class AddLocationActivity extends AppCompatActivity {
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
         //pridobi EditText it layout-a
-        imeET = (EditText) findViewById(R.id.ime);
-        opisET = (EditText) findViewById(R.id.opis);
-        latET = (EditText) findViewById(R.id.lat);
-        lngET = (EditText) findViewById(R.id.lng);
-        manualGps = (CheckBox) findViewById(R.id.use_gps);
-        qrCode = (TextView) findViewById(R.id.qr_code);
+        imeET = findViewById(R.id.ime);
+        opisET = findViewById(R.id.opis);
+        latET = findViewById(R.id.lat);
+        lngET = findViewById(R.id.lng);
+        manualGps = findViewById(R.id.use_gps);
+        qrCode = findViewById(R.id.qr_code);
+        downloadQr = findViewById(R.id.download_qr_code);
 
         // preberi vse lokacije shranjene v sharedPreferences
         loadLocations();
@@ -218,9 +223,9 @@ public class AddLocationActivity extends AppCompatActivity {
             else{
                 // funckija generira in vrne random string sestavljen iz črk in velikih ter malih črk
                 /** POTREBNO PREVERIT CE uID ZE OBSTAJA, DAT WHILE ZANKO*/
-                idL = generateuID();
+                uID = generateuID();
 
-                writeNewLokacija(idL ,imeET.getText().toString(), opisET.getText().toString(), Float.valueOf(latET.getText().toString()), Float.valueOf(lngET.getText().toString()));
+                writeNewLokacija(uID ,imeET.getText().toString(), opisET.getText().toString(), Float.valueOf(latET.getText().toString()), Float.valueOf(lngET.getText().toString()));
             }
         }
     }
@@ -247,7 +252,12 @@ public class AddLocationActivity extends AppCompatActivity {
                 lngET.setText(null);
             }
 
-            qrCode.setText("ID ZA QR KODO: "+lokacijaId);
+            qrCode.setText("ID LOKACIJE: "+lokacijaId+"\nIME LOKACIJE: "+ime+"\nKOORDINATE: "+lat+"  "+lng);
+            qrCode.setVisibility(View.VISIBLE);
+            downloadQr.setVisibility(View.VISIBLE);
+            downloadQr.setClickable(true);
+
+
 
             loadLocations();
         } else {
@@ -279,6 +289,14 @@ public class AddLocationActivity extends AppCompatActivity {
             randomString += alphabet.charAt(r.nextInt(alphabet.length()));
         }
         return randomString;
+    }
+
+    // odpre se stran za prenos QR kode
+    public void prenesiQr(View view){
+        String url = "https://chart.googleapis.com/chart?cht=qr&chl="+uID+"&chs=500x500&choe=UTF-8&chld=L%7C2";
+        Intent website = new Intent(Intent.ACTION_VIEW);
+        website.setData(Uri.parse(url));
+        startActivity(website);
     }
 
     private void setUseGpsLocation(Boolean checked){
