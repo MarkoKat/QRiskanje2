@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private Double currLat;
     private Double currLng;
     private Boolean foundLastLoc = false;
+    private boolean prikazanSeznam = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
         listButton = findViewById(R.id.button_list);
         scanButton = findViewById(R.id.scan_barcode);
         mapButton = findViewById(R.id.button_maps);
+
+        // refresh od swipanju
+        container = (SwipeRefreshLayout) findViewById(R.id.container);
+        container.setOnRefreshListener(mOnRefreshListener);
 
         //samo zacasni tabeli
         String[][] tabela = {
@@ -260,8 +265,8 @@ public class MainActivity extends AppCompatActivity {
                 /** TUKAJ DODAJ DELITEV V ISKANE IN ZE NAJDENE LOKACIJE*/
 
                 toBeFoundLocations = allLocations;
-                // se prikaze samo prva lokacija v seznamu trenutno
-                foundLocations.add(allLocations.get(0));
+                foundLocations = allLocations;
+
 
 
 
@@ -276,14 +281,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         mDatabase.addValueEventListener(postListener);
-
-        // refresh od swipanju
-        container = (SwipeRefreshLayout) findViewById(R.id.container);
-        container.setOnRefreshListener(mOnRefreshListener);
-
-        // izpis iz shared Preferences v seznam
-        updateLocationList();
-
 
         //Pridobi lokacijo iz GPS
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -304,24 +301,36 @@ public class MainActivity extends AppCompatActivity {
                                 currLng = location.getLongitude();
 
                                 foundLastLoc = true;
-                                updateLocationList();
+                                if (!allLocations.isEmpty() && allLocations != null){
+                                    updateLocationList();
+                                }
                             }
                         }
                     });
         }
 
+
+        //izpis iz shared Preferences v seznam
+        if (!allLocations.isEmpty() && allLocations != null) {
+            updateLocationList();
+        }
     }
 
     // refresh od swipanju
     protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            updateLocationList();
+            if(!allLocations.isEmpty() && allLocations != null){
+                updateLocationList();
+            }
         }
     };
 
     // ko swipas updata list
     public void updateLocationList(){
+        if (!prikazanSeznam){
+            prikazanSeznam = true;
+        }
         if(displayingAllLocations = true){
             displayingLocations = toBeFoundLocations;
         }
@@ -357,6 +366,7 @@ public class MainActivity extends AppCompatActivity {
                 prikaziPodrobnosti(selectedLocation.getIme());
             }
         });
+
         // da izgine ikonca za osvezevanje
         if (container.isRefreshing()) {
             container.setRefreshing(false);
@@ -473,6 +483,10 @@ public class MainActivity extends AppCompatActivity {
 
     // shrani lokacijo iz baze v sharedPreferences
     private void saveLocations(){
+        if (!prikazanSeznam && (!allLocations.isEmpty() && allLocations != null)){
+            prikazanSeznam = true;
+            updateLocationList();
+        }
         SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
@@ -496,12 +510,18 @@ public class MainActivity extends AppCompatActivity {
 
         if (allLocations == null){
             allLocations = new ArrayList<>();
+            foundLocations = new ArrayList<>();
+            toBeFoundLocations = new ArrayList<>();
         }
         else{
             /** TUKAJ DODAJ DELITEV V ISKANE IN ZE NAJDENE LOKACIJE*/
             toBeFoundLocations = allLocations;
             // se prikaze samo prva lokacija v seznamu trenutno
             foundLocations = allLocations;
+        }
+        if (!prikazanSeznam && (!allLocations.isEmpty() && allLocations != null)){
+            prikazanSeznam = true;
+            updateLocationList();
         }
     }
 
@@ -515,7 +535,9 @@ public class MainActivity extends AppCompatActivity {
     // Prikaze seznam vseh se ne najdenih lokacij
     public void displayAllLocations(View view){
         displayingAllLocations = true;
-        updateLocationList();
+        if(!allLocations.isEmpty() && allLocations != null){
+            updateLocationList();
+        }
         listAllLocations.setClickable(false);
         listFoundLocations.setClickable(true);
         listAllLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -525,7 +547,9 @@ public class MainActivity extends AppCompatActivity {
     // Prikaze seznam ze najdenih lokacij
     public void displayFoundLocations(View view){
         displayingAllLocations = false;
-        updateLocationList();
+        if(!allLocations.isEmpty() && allLocations != null){
+            updateLocationList();
+        }
         listAllLocations.setClickable(true);
         listFoundLocations.setClickable(false);
         listFoundLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -550,6 +574,9 @@ public class MainActivity extends AppCompatActivity {
         listButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         scanButton.setBackgroundColor(Color.GRAY);
         mapButton.setBackgroundColor(Color.GRAY);
+        if (!allLocations.isEmpty() && allLocations != null){
+            updateLocationList();
+        }
 
         // dodaj request za lokacijo vsakih 20 sekund (max 2 minuti)
         if (mFusedLocationClient != null) {
@@ -592,16 +619,19 @@ public class MainActivity extends AppCompatActivity {
     LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            if (!foundLastLoc){
-                foundLastLoc = true;
-                updateLocationList();
-            }
+
             List<Location> locationList = locationResult.getLocations();
             if (locationList.size() > 0) {
                 //The last location in the list is the newest
                 Location location = locationList.get(locationList.size() - 1);
                 currLat = location.getLatitude();
                 currLng = location.getLongitude();
+                if (!foundLastLoc){
+                    foundLastLoc = true;
+                    if(!allLocations.isEmpty() && allLocations != null){
+                        updateLocationList();
+                    }
+                }
             }
         }
     };
@@ -616,11 +646,16 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
+                    if(!allLocations.isEmpty() && allLocations != null){
+                        updateLocationList();
+                    }
 
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-
+                    if(!allLocations.isEmpty() && allLocations != null){
+                        updateLocationList();
+                    }
                 }
                 return;
             }
