@@ -6,45 +6,52 @@
     android:layout_height="match_parent"
     tools:context=".MapsActivity">
 
-    <Button
-        android:id="@+id/scan_barcode"
-        android:layout_width="wrap_content"
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:onClick="scanBarcode"
-        android:text="Skeniraj qr"
+        android:id="@+id/pick_activity"
+        android:weightSum="3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" >
 
-    <Button
-        android:id="@+id/button_maps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/button_list"
+            android:clickable="false"
+            android:background="@android:color/darker_gray"
+            android:src="@drawable/ic_format_list_bulleted_white_24dp"
+            android:autoSizeTextType="uniform"
+            android:layout_weight="1"
+            android:onClick="showList"
+            />
 
-        android:text="zemljevid"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/scan_barcode"
-        android:backgroundTint="@android:color/holo_blue_light"/>
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/scan_barcode"
+            android:onClick="scanBarcode"
+            android:src="@drawable/ic_camera_alt_white_24dp"
+            android:background="@android:color/darker_gray"
+            app:layout_constraintStart_toEndOf="@id/all_locations"
+            android:autoSizeTextType="uniform"
+            android:layout_weight="1"
+            />
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/button_maps"
+            android:src="@drawable/ic_map_white_24dp"
+            android:background="@color/colorPrimary"
+            android:autoSizeTextType="uniform"
+            android:layout_weight="1"
+            />
 
-    <Button
-        android:id="@+id/button_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="showList"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="seznam"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/scan_barcode"
-        app:layout_constraintStart_toStartOf="parent" />
+    </LinearLayout>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
