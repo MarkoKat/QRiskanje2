@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.File;
 import java.io.FileInputStream;
+
+import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -76,6 +79,13 @@ public class DetailActivity extends AppCompatActivity {
 
 
         TextView textView2 = findViewById(R.id.textView_namig);
+        if (Build.VERSION.SDK_INT >= 26) {
+            // Call some material design APIs here
+            textView2.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
+        } else {
+            // Implement this feature without material design
+        }
+
         TextView textViewId = findViewById(R.id.textView_id);
         int ok = 0;
         for(int i = 0; i < tabela.length; i++){

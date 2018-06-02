@@ -23,6 +23,8 @@ public class ResultActivity extends AppCompatActivity {
     public static String[][] tabela;
     public static String[][] tabelaUser;
 
+    private static final String TAG = "ResultActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +66,9 @@ public class ResultActivity extends AppCompatActivity {
             if(message.equals(tabela[i][0])){
                 textView.setText(tabela[i][1]);
 
+                Log.i(TAG, "MarkoRes "+ message + "::::" + tabela[i][0]);
+                Log.i(TAG, "MarkoRes2 "+ tabelaUser[i][0] + "::::" + tabelaUser[i][1]);
+
                 if (tabelaUser[i][1].equals("1")) {
                     ok = 2;
                 }
@@ -79,6 +84,17 @@ public class ResultActivity extends AppCompatActivity {
                         sbUser.append(tmpUser).append("%");
                     }
                     vpisiVDatoteko(filenameUser, sbUser.toString());
+
+                    //to pol zbrisi
+                    String tabelaUser2t = beriIzDatoteke(filenameUser);
+                    String[] tabelaUser3t = tabelaUser2t.split("%");
+                    String[][] tabelaUser4t = new String[tabelaUser3t.length][2];
+                    for (int it = 0; it < tabelaUser3t.length; it++) {
+                        String[] tabelaUserTMPt = tabelaUser3t[it].split("#");
+                        tabelaUser4t[it] = tabelaUserTMPt;
+                    }
+
+                    Log.i(TAG, "MarkoRes3 "+ tabelaUser4t[i][0] + "::::" + tabelaUser4t[i][1]);
                 }
 
             }

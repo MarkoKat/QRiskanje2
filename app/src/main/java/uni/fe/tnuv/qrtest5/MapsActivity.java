@@ -2,7 +2,9 @@ package uni.fe.tnuv.qrtest5;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -33,6 +36,7 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
 
@@ -50,17 +54,27 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     private String filename;
     private String filenameUser;
 
+    private boolean mapReady = false;
+
+    private static final String LONGITUDE = "longitude";
+    private static final String LATITUDE = "latitude";
+    private static final String ZOOM = "zoom";
+    private static final String BEARING = "bearing";
+    private static final String TILT = "tilt";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        Log.i(TAG, "MarkoCreate");
 
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
 
         //Branje lokacij iz datotecnega sistema
         String tabela2 = beriIzDatoteke(filename);
-        Log.i(TAG, "Marko123" + tabela2);
+        //Log.i(TAG, "Marko123" + tabela2);
         String[] tabela3 = tabela2.split("%");
         String[][] tabela4 = new String[tabela3.length][5];
         //List<String> tabela4 = new ArrayList<String>();
@@ -117,7 +131,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
 
                                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12);
-                                mMap.animateCamera(cameraUpdate);
+                                //mMap.animateCamera(cameraUpdate);
                             }
                         }
                     });
@@ -131,6 +145,23 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     @Override
     public void onMapReady(GoogleMap map) {
         mMap = map;
+
+        mapReady = true;
+
+        SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
+
+        double latitude = sharedPrefs.getFloat(LATITUDE, 0);
+        double longitude = sharedPrefs.getFloat(LONGITUDE, 0);
+        LatLng target = new LatLng(latitude, longitude);
+
+        float zoom = sharedPrefs.getFloat(ZOOM, 0);
+        float bearing = sharedPrefs.getFloat(BEARING, 0);
+        float tilt = sharedPrefs.getFloat(TILT, 0);
+
+        CameraPosition position = new CameraPosition(target, zoom, tilt, bearing);
+        CameraUpdate update = CameraUpdateFactory.newCameraPosition(position);
+
+        mMap.moveCamera(update);
 
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -310,4 +341,33 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
             }
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if(mapReady) {
+            try{
+                Log.i(TAG, "MarkoPause " + mMap.getCameraPosition().toString());
+
+                SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
+
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                CameraPosition position = mMap.getCameraPosition();
+
+                editor.putFloat(LATITUDE, (float) position.target.latitude);
+                editor.putFloat(LONGITUDE, (float) position.target.longitude);
+                editor.putFloat(ZOOM, position.zoom);
+                editor.putFloat(TILT, position.tilt);
+                editor.putFloat(BEARING, position.bearing);
+                editor.apply();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
 }

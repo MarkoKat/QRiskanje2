@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Ugotavljanje prvega zagona aplikacije
-        final String PREFS_NAME = "MyPrefsFile";
+        final String PREFS_NAME = "PrviZagonFile";
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
@@ -123,8 +123,10 @@ public class MainActivity extends AppCompatActivity {
                 sbUser.append(tmpUser);
 
             }
-            Log.i(TAG, "Marko222"+ sbUser.toString());
+            Log.i(TAG, "MarkoXX"+ sbUser.toString());
             vpisiVDatoteko(filenameUser, sbUser.toString());
+
+            settings.edit().putBoolean("my_first_time", false).apply();
         }
         else {
             // Posodobitev tabele z najdenimi lokacijami
@@ -394,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
             sbUser.append(tmpUser);
         }
 
-        //Log.i(TAG, "Marko222"+ sbUser.toString());
+        Log.i(TAG, "Marko222"+ sbUser.toString());
         vpisiVDatoteko(filenameUser, sbUser.toString());
     }
 }
