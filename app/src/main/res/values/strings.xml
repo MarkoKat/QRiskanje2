@@ -2,4 +2,13 @@
     <string name="app_name">QRtest5</string>
     <string name="datotekaZVsebino">podatki.txt</string>
     <string name="datotekaZVsebinoUser">userNov.txt</string>
+    <string name="obvestiloNiLokacijskihStoritevDetail">Za prikaz razdalje morate omogočiti lokacijske storitve</string>
+    <string name="napakaNamig">Napaka pri iskanju namiga!</string>
+    <string name="strLongitude">longitude</string>
+    <string name="strLatitude">latitude</string>
+    <string name="strZoom">zoom</string>
+    <string name="strBearing">bearing</string>
+    <string name="strTilt">tilt</string>
+    <string name="strPrekinjenoSkeniranje">Prekinili ste skeniranje!</string>
+    <string name="nazajNaSeznam">NAZAJ NA SEZNAM</string>
 </resources>

@@ -5,7 +5,7 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -37,10 +37,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDvItnYo6KFdAgP6V2temCUnJmvLmLUx5U" />
 
-        <activity android:name=".DetailActivity"
-            android:parentActivityName=".MapsActivity">
-        </activity>
-        <activity android:name=".AddLocationActivity"></activity>
+        <activity
+            android:name=".DetailActivity"
+            android:parentActivityName=".MapsActivity" />
+        <activity android:name=".AddLocationActivity" />
+
     </application>
 
 </manifest>

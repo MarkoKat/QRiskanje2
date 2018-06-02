@@ -73,9 +73,8 @@ public class MainActivity extends AppCompatActivity {
 
         //prebere podatke v allLocations iz sharedPreferences
         loadLocations();
-        //Log.i(TAG, allLocations.toString());
         LocationInfo tmpLoc = new LocationInfo();
-        //Log.i(TAG, "Marko345" + allLocations.size());
+
 
         /*
         StringBuilder sb = new StringBuilder();
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         }
         vpisiVDatoteko(filename, sb.toString());
         */
-        posodobiLokalnoTabeloLokacij();
+        posodobiLokalnoTabeloLokacij(); // Podatke o lokacijah shrani v lokalno tabelo
 
         //Pretvarjanje enega stringa v tabelo
         String tabela2 = beriIzDatoteke(filename);
@@ -114,16 +113,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Comments", "First time");
 
             // first time task
-            // Posodobitev tabele z najdenimi lokacijami
+            // Prva nastavitev tabele z najdenimi lokacijami
             StringBuilder sbUser = new StringBuilder();
             for (int i = 0; i < allLocations.size(); i++) {
-
                 String tmpUser = allLocations.get(i).getuID() + "#" + "0" + "#" + "%";
-
                 sbUser.append(tmpUser);
 
             }
-            Log.i(TAG, "MarkoXX"+ sbUser.toString());
             vpisiVDatoteko(filenameUser, sbUser.toString());
 
             settings.edit().putBoolean("my_first_time", false).apply();
@@ -194,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             container.setRefreshing(false);
         }
 
-        // Mogoce tukaj dodat za posodobitev lokacij
+        // Posodobitev podatkov o lokacijah v datotecnem sistemu
         posodobiLokalnoTabeloLokacij();
         posodobiLokalnoTabeloNajdenih();
     }
@@ -222,8 +218,6 @@ public class MainActivity extends AppCompatActivity {
 
     //Zagon Qr scannerja
     public void scanBarcode(View v) {
-        //Intent intent = new Intent(this, ScanBarcodeActivity.class);
-        //startActivityForResult(intent, 0);
 
         final Activity activity = this;
         IntentIntegrator integrator = new IntentIntegrator(activity);
@@ -264,12 +258,13 @@ public class MainActivity extends AppCompatActivity {
     }
     */
 
+    // Upravljanje rezultata skeniranja QR kode
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null){
             if(result.getContents()==null) {
-                Toast.makeText(this, "Prekinili ste skeniranje", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.strPrekinjenoSkeniranje), Toast.LENGTH_LONG).show();
             }
             else{
                 Intent intent = new Intent(this, ResultActivity.class);
@@ -283,9 +278,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // Prehod na aktivnost z zemljevidom
     public void showMaps(View v) {
         Intent intent = new Intent(this, MapsActivity.class);
-        //intent.putExtra("barcode", barcode);
         startActivity(intent);
     }
 
@@ -360,9 +355,7 @@ public class MainActivity extends AppCompatActivity {
                     + allLocations.get(i).getOpis() + "#"
                     + allLocations.get(i).getLat() + "#"
                     + allLocations.get(i).getLng() + "#" + "%";
-            //Log.i(TAG, "Marko345" + tmp);
             sb.append(tmp);
-
         }
         vpisiVDatoteko(filename, sb.toString());
     }
@@ -380,7 +373,6 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < allLocations.size(); i++) {
             String tmpUser = "";
-            //String tmpUser = allLocations.get(i).getuID() + "#" + "0" + "#" + "%";
             int ok = 0;
             for (int n = 0; n < tabelaUser4.length; n++) {
                 if(allLocations.get(i).getuID().equals(tabelaUser4[n][0])) {
@@ -396,7 +388,6 @@ public class MainActivity extends AppCompatActivity {
             sbUser.append(tmpUser);
         }
 
-        Log.i(TAG, "Marko222"+ sbUser.toString());
         vpisiVDatoteko(filenameUser, sbUser.toString());
     }
 }
