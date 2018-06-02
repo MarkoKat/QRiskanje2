@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/ime"
         android:hint="Ime"
+        android:maxLength="100"
         />
 
     <EditText
@@ -20,13 +21,15 @@
         android:inputType="textMultiLine"
         android:singleLine="false"
         android:maxLines="5"
-        android:gravity="top"/>
+        android:gravity="top"
+        android:maxLength="2000"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lat"
         android:hint="Zemljepisna širina (od -90° do +90°)"
         android:inputType="numberDecimal|numberSigned"
+        android:maxLength="100"
         />
     <EditText
         android:layout_width="match_parent"
@@ -34,6 +37,7 @@
         android:id="@+id/lng"
         android:hint="Zemljepisna dolžina (od -180° do +180°)"
         android:inputType="numberDecimal|numberSigned"
+        android:maxLength="100"
         />
 
     <CheckBox
@@ -46,9 +50,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pošlji"
+        android:text="Dodaj lokacijo   "
         android:onClick="poslji"
         android:layout_gravity="center"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:drawableRight="@drawable/ic_send_white_24dp"
         />
     <TextView
         android:layout_width="wrap_content"
@@ -66,5 +73,8 @@
         android:layout_gravity="center"
         android:visibility="invisible"
         android:clickable="false"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/colorAccent"
+        android:drawableLeft="@drawable/ic_file_download_white_24dp"
         />
 </LinearLayout>

@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private Double currLng;
     private Boolean foundLastLoc = false;
     private boolean prikazanSeznam = false;
+    private boolean prikazanPrazenSeznam = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,12 +263,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 allLocations = currLocationsList;
+                toBeFoundLocations = allLocations;
+                foundLocations = allLocations;
+
+
                 saveLocations();
 
                 /** TUKAJ DODAJ DELITEV V ISKANE IN ZE NAJDENE LOKACIJE*/
 
-                toBeFoundLocations = allLocations;
-                foundLocations = allLocations;
 
 
 
@@ -303,9 +306,7 @@ public class MainActivity extends AppCompatActivity {
                                 currLng = location.getLongitude();
 
                                 foundLastLoc = true;
-                                if (!allLocations.isEmpty() && allLocations != null){
-                                    updateLocationList();
-                                }
+                                updateLocationList();
                             }
                         }
                     });
@@ -325,90 +326,112 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
-                if (!allLocations.isEmpty() && allLocations != null) {
-                    updateLocationList();
-                }
+                updateLocationList();
             }
         });
 
 
-        //izpis iz shared Preferences v seznam
-        if (!allLocations.isEmpty() && allLocations != null) {
-            updateLocationList();
-        }
+        //izpis seznama ce se ta se vedno ni zgodil
+        updateLocationList();
     }
 
     // refresh od swipanju
     protected SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            if(!allLocations.isEmpty() && allLocations != null){
-                updateLocationList();
-            }
+            updateLocationList();
         }
     };
 
     // ko swipas updata list
     public void updateLocationList(){
-        if (!prikazanSeznam){
-            prikazanSeznam = true;
-        }
-        if(displayingAllLocations = true){
-            displayingLocations = toBeFoundLocations;
-        }
-        else{
-            displayingLocations = foundLocations;
-        }
-
-
-        // ce je kaj v searchinputu se naredi filter kar je notr
-        if (searchInput.getText().toString() != ""){
-            String filter = searchInput.getText().toString();
-            ArrayList<LocationInfo> filteredLocations = new ArrayList<>();
-            for (int i = 0; i < displayingLocations.size(); i++) {
-                if(displayingLocations.get(i).getIme().toLowerCase().contains(filter.toLowerCase())){
-                    filteredLocations.add(displayingLocations.get(i));
+        if (toBeFoundLocations != null && foundLocations != null){
+            if (!prikazanSeznam){
+                prikazanSeznam = true;
+            }
+            if(displayingAllLocations == true){
+                displayingLocations = toBeFoundLocations;
+                if (displayingLocations.isEmpty() && AppNetworkStatus.getInstance(getApplicationContext()).isOnline()){
+                    info.setText("Nalagam lokacije...");
+                }
+                else if(displayingLocations.isEmpty()){
+                    info.setText("Za prenos lokacij je potrebna internetna povezava!");
                 }
             }
-            displayingLocations = filteredLocations;
-        }
-
-
-        // ce je dobljena lokacija, lahko vsaki lokaciji dodamo se distance
-        if (foundLastLoc){
-            for (int i = 0; i < displayingLocations.size(); i++) {
-                Location loc1 = new Location("");
-                loc1.setLatitude(currLat);
-                loc1.setLongitude(currLng);
-
-                Location loc2 = new Location("");
-                loc2.setLatitude(displayingLocations.get(i).getLat());
-                loc2.setLongitude(displayingLocations.get(i).getLng());
-
-                float distanceInMeters = loc1.distanceTo(loc2);
-                displayingLocations.get(i).setDist(distanceInMeters);
+            else{
+                Log.d("DAVIDTEST", "pridem do tukaj");
+                displayingLocations = foundLocations;
+                if (displayingLocations.isEmpty()){
+                    info.setText("Odkril nisi še nobene lokacije. \nOdpravi se na pot in skeniraj QR kode!");
+                }
             }
 
-            // razvrsti po razdalji od najmanjse do najvecje
-            Collections.sort(displayingLocations, new LocationDistanceComparator());
+            if (displayingLocations.isEmpty()){
+                prikazanPrazenSeznam = true;
+            }
+            else{
+                info.setText("");
+            }
+
+
+            // ce je kaj v searchinputu se naredi filter kar je notr
+
+            if (searchInput.getText().toString() != "" && !displayingLocations.isEmpty()){
+                String filter = searchInput.getText().toString();
+                ArrayList<LocationInfo> filteredLocations = new ArrayList<>();
+                for (int i = 0; i < displayingLocations.size(); i++) {
+                    if(displayingLocations.get(i).getIme().toLowerCase().contains(filter.toLowerCase())){
+                        filteredLocations.add(displayingLocations.get(i));
+                    }
+                }
+                displayingLocations = filteredLocations;
+                if (filteredLocations.isEmpty()) {
+                    info.setText("Ne najdem lokacij!");
+                }
+            }
+
+
+
+            // ce je dobljena lokacija, lahko vsaki lokaciji dodamo se distance
+            if (foundLastLoc){
+                for (int i = 0; i < displayingLocations.size(); i++) {
+                    Location loc1 = new Location("");
+                    loc1.setLatitude(currLat);
+                    loc1.setLongitude(currLng);
+
+                    Location loc2 = new Location("");
+                    loc2.setLatitude(displayingLocations.get(i).getLat());
+                    loc2.setLongitude(displayingLocations.get(i).getLng());
+
+                    float distanceInMeters = loc1.distanceTo(loc2);
+                    displayingLocations.get(i).setDist(distanceInMeters);
+                }
+
+                // razvrsti po razdalji od najmanjse do najvecje
+                Collections.sort(displayingLocations, new LocationDistanceComparator());
+            }
+            else{
+                // ce ni lokacije razvrsti po imenu
+                Collections.sort(displayingLocations, new LocationNameComparator());
+            }
+
+            ListView  mListView = (ListView) findViewById(R.id.list_view);
+            LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, displayingLocations);
+            mListView.setAdapter(adapter);
+            // OnClick na item na seznamu prikaze podrobnosti za lokacijo
+            mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    // Pridobimo lokacijo iz ArrayList na katero je uporabnik pritisnil
+                    LocationInfo selectedLocation = (LocationInfo) parent.getItemAtPosition(position);
+                    prikaziPodrobnosti(selectedLocation.getIme());
+                }
+            });
         }
         else{
-            // ce ni lokacije razvrsti po imenu
-            Collections.sort(displayingLocations, new LocationNameComparator());
+            info.setText("Nalagam lokacije...");
         }
 
-        ListView  mListView = (ListView) findViewById(R.id.list_view);
-        LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, displayingLocations);
-        mListView.setAdapter(adapter);
-        // OnClick na item na seznamu prikaze podrobnosti za lokacijo
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Pridobimo lokacijo iz ArrayList na katero je uporabnik pritisnil
-                LocationInfo selectedLocation = (LocationInfo) parent.getItemAtPosition(position);
-                prikaziPodrobnosti(selectedLocation.getIme());
-            }
-        });
 
         // da izgine ikonca za osvezevanje
         if (container.isRefreshing()) {
@@ -532,8 +555,8 @@ public class MainActivity extends AppCompatActivity {
 
     // shrani lokacijo iz baze v sharedPreferences
     private void saveLocations(){
-        if (!prikazanSeznam && (!allLocations.isEmpty() && allLocations != null)){
-            prikazanSeznam = true;
+        if (prikazanPrazenSeznam && (!toBeFoundLocations.isEmpty() || !foundLocations.isEmpty())){
+            prikazanPrazenSeznam = false;
             updateLocationList();
         }
         SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
@@ -568,8 +591,7 @@ public class MainActivity extends AppCompatActivity {
             // se prikaze samo prva lokacija v seznamu trenutno
             foundLocations = allLocations;
         }
-        if (!prikazanSeznam && (!allLocations.isEmpty() && allLocations != null)){
-            prikazanSeznam = true;
+        if (!prikazanSeznam){
             updateLocationList();
         }
     }
@@ -584,9 +606,7 @@ public class MainActivity extends AppCompatActivity {
     // Prikaze seznam vseh se ne najdenih lokacij
     public void displayAllLocations(View view){
         displayingAllLocations = true;
-        if(!allLocations.isEmpty() && allLocations != null){
-            updateLocationList();
-        }
+        updateLocationList();
         listAllLocations.setClickable(false);
         listFoundLocations.setClickable(true);
         listAllLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -596,9 +616,7 @@ public class MainActivity extends AppCompatActivity {
     // Prikaze seznam ze najdenih lokacij
     public void displayFoundLocations(View view){
         displayingAllLocations = false;
-        if(!allLocations.isEmpty() && allLocations != null){
-            updateLocationList();
-        }
+        updateLocationList();
         listAllLocations.setClickable(true);
         listFoundLocations.setClickable(false);
         listFoundLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -631,9 +649,8 @@ public class MainActivity extends AppCompatActivity {
         listButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         scanButton.setBackgroundColor(Color.GRAY);
         mapButton.setBackgroundColor(Color.GRAY);
-        if (!allLocations.isEmpty() && allLocations != null){
-            updateLocationList();
-        }
+
+        updateLocationList();
 
         // dodaj request za lokacijo vsakih 20 sekund (max 2 minuti)
         if (mFusedLocationClient != null) {
@@ -685,9 +702,7 @@ public class MainActivity extends AppCompatActivity {
                 currLng = location.getLongitude();
                 if (!foundLastLoc){
                     foundLastLoc = true;
-                    if(!allLocations.isEmpty() && allLocations != null){
-                        updateLocationList();
-                    }
+                    updateLocationList();
                 }
             }
         }
@@ -703,16 +718,11 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
-                    if(!allLocations.isEmpty() && allLocations != null){
                         updateLocationList();
-                    }
-
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
-                    if(!allLocations.isEmpty() && allLocations != null){
-                        updateLocationList();
-                    }
+                    updateLocationList();
                 }
                 return;
             }
