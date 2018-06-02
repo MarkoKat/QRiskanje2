@@ -298,7 +298,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             else{
-                Log.d("DAVIDTEST", "pridem do tukaj");
                 displayingLocations = foundLocations;
                 if (displayingLocations.isEmpty()){
                     info.setText("Odkril nisi še nobene lokacije. \nOdpravi se na pot in skeniraj QR kode!");
@@ -429,33 +428,6 @@ public class MainActivity extends AppCompatActivity {
         integrator.setBarcodeImageEnabled(false);
         integrator.initiateScan();
     }
-
-    /*
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==0) {
-            if(resultCode == CommonStatusCodes.SUCCESS) {
-                if(data!=null) {
-                    Barcode barcode = data.getParcelableExtra("barcode");
-                    Intent intent = new Intent(this, ResultActivity.class);
-                    intent.putExtra("barcode", barcode.displayValue);
-                    startActivity(intent);
-
-                    /*Barcode barcode = data.getParcelableExtra("barcode");
-                    Log.i(TAG, "Koda2: " + barcode.displayValue);
-                    barcodeResult.setText(barcode.displayValue);*/
-                /*}
-                else {
-                    barcodeResult.setText("QR koda ni bila najdena");
-                }
-            }
-        }
-        else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-
-    }
-    */
 
     // Upravljanje rezultata skeniranja QR kode
     @Override
