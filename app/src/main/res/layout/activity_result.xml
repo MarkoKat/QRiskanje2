@@ -7,6 +7,21 @@
     tools:context="uni.fe.tnuv.qrtest5.ResultActivity">
 
     <TextView
+        android:id="@+id/textView_razlaga"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/barcode_result"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.96" />
+
+    <TextView
         android:id="@+id/barcode_result"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -15,7 +30,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:textSize="24dp"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,12 +38,19 @@
         app:layout_constraintVertical_bias="0.75" />
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/imgview"
-        android:layout_marginEnd="32dp"
-        android:layout_marginStart="32dp"
-        />
+        android:layout_width="wrap_content"
+        android:layout_height="250dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/barcode_result"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.22000003" />
 
     <Button
         android:id="@+id/scan_barcode"
@@ -39,11 +61,12 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:onClick="showList"
-        android:text="NAZAJ NA SEZNAM"
-        android:textSize="24dp"
+        android:text="@string/nazajNaSeznam"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/barcode_result" />
+        app:layout_constraintTop_toBottomOf="@+id/barcode_result"
+        app:layout_constraintVertical_bias="0.8" />
 
 </android.support.constraint.ConstraintLayout>

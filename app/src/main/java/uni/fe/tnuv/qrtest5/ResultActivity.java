@@ -17,11 +17,12 @@ import java.io.FileOutputStream;
 
 public class ResultActivity extends AppCompatActivity {
 
-    //public static String[][] tabela = {{"123456", "Fakulteta za elektrotehniko"}, {"111111", "Prešernov spomenik"}};
     private String filename;
     private String filenameUser;
     public static String[][] tabela;
     public static String[][] tabelaUser;
+
+    private static final String TAG = "ResultActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,52 +51,71 @@ public class ResultActivity extends AppCompatActivity {
         }
         tabelaUser = tabelaUser4;
 
-
-
+        // Pridobivanje podatkov o rezultatu skeniranja
         Intent intent = getIntent();
         String message = intent.getStringExtra("barcode");
 
-        // Capture the layout's TextView and set the string as its text
-        TextView textView = findViewById(R.id.barcode_result);
-        textView.setText(message);
+        TextView textViewIme = findViewById(R.id.barcode_result);
 
         int ok = 0;
         for(int i = 0; i < tabela.length; i++){
             if(message.equals(tabela[i][0])){
-                textView.setText(tabela[i][1]);
-                ok = 1;
-                tabelaUser[i][1] = "1";
-                StringBuilder sbUser = new StringBuilder();
-                for (int i2 = 0; i2 < tabelaUser.length; i2++) {
-                    StringBuilder tmpUser = new StringBuilder();
-                    for (int j2 = 0; j2 < tabelaUser[i2].length; j2++) {
-                        tmpUser.append(tabelaUser[i2][j2]).append("#");
-                    }
-                    sbUser.append(tmpUser).append("%");
+                textViewIme.setText(tabela[i][1]);
+
+                if (tabelaUser[i][1].equals("1")) {
+                    ok = 2;
                 }
-                vpisiVDatoteko(filenameUser, sbUser.toString());
+                else {
+                    ok = 1;
+                    tabelaUser[i][1] = "1";
+                    StringBuilder sbUser = new StringBuilder();
+                    for (int i2 = 0; i2 < tabelaUser.length; i2++) {
+                        StringBuilder tmpUser = new StringBuilder();
+                        for (int j2 = 0; j2 < tabelaUser[i2].length; j2++) {
+                            tmpUser.append(tabelaUser[i2][j2]).append("#");
+                        }
+                        sbUser.append(tmpUser).append("%");
+                    }
+                    vpisiVDatoteko(filenameUser, sbUser.toString());
+                }
+
             }
         }
         if(ok == 0) {
-            textView.setText("QR koda ni veljavna!");
+            textViewIme.setText("QR koda ni veljavna!");
         }
 
-        //Prikaz zelene kljukice
-        ImageView myImageView = (ImageView) findViewById(R.id.imgview);
-        Bitmap myBitmap = BitmapFactory.decodeResource(
-                getApplicationContext().getResources(),
-                R.drawable.klj2);
-        myImageView.setImageBitmap(myBitmap);
+        //Prikaz ikone
+        ImageView myImageView = findViewById(R.id.imgview);
+        TextView razlaga = findViewById(R.id.textView_razlaga);
+        if(ok == 1) {
+            Bitmap myBitmap = BitmapFactory.decodeResource(
+                    getApplicationContext().getResources(),
+                    R.drawable.klj2);
+            myImageView.setImageBitmap(myBitmap);
+            razlaga.setText("Našli ste QR kodo na lokaciji:");
+        }
+        else if (ok == 2) {
+            Bitmap myBitmap = BitmapFactory.decodeResource(
+                    getApplicationContext().getResources(),
+                    R.drawable.zenajdeno);
+            myImageView.setImageBitmap(myBitmap);
+            razlaga.setText("To QR kodo ste že našli");
+        }
+        else {
+            Bitmap myBitmap = BitmapFactory.decodeResource(
+                    getApplicationContext().getResources(),
+                    R.drawable.napacna2);
+            myImageView.setImageBitmap(myBitmap);
+        }
+
     }
 
     //Za shranjevanje v datotečni sistem------------------------------------------------------------
     private void vpisiVDatoteko(String filenameLoc, String vsebina){
         try {
-            //ustvarimo izhodni tok
             FileOutputStream os = openFileOutput(filenameLoc, Context.MODE_PRIVATE);
-            //zapisemo posredovano vsebino v datoteko
             os.write(vsebina.getBytes());
-            //sprostimo izhodni tok
             os.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,7 +144,6 @@ public class ResultActivity extends AppCompatActivity {
 
     public void showList(View v) {
         Intent intent = new Intent(this, MainActivity.class);
-        //intent.putExtra("barcode", barcode);
         startActivity(intent);
     }
 }

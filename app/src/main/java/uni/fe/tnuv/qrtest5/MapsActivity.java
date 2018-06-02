@@ -2,7 +2,9 @@ package uni.fe.tnuv.qrtest5;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -33,13 +36,10 @@ import com.google.zxing.integration.android.IntentResult;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
-public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    /*public static String[][] tabela = {
-            {"123456", "Fakulteta za elektrotehniko", "Namig, ki ga ni", "46.044783", "14.489494"},
-            {"111111", "Prešernov spomenik", "Tudi tu ni namioga", "46.051389", "14.506317"},
-            {"000001", "Stari grad smlednik", "Za tisto sivo skalo", "46.165446", "14.442362"}};*/
     public static String[][] tabela;
     public static String[][] tabelaUser;
 
@@ -50,6 +50,14 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     private String filename;
     private String filenameUser;
 
+    private boolean mapReady = false;
+
+    private String LONGITUDE = "longitude";
+    private String LATITUDE = "latitude";
+    private String ZOOM = "zoom";
+    private String BEARING = "bearing";
+    private String TILT = "tilt";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,20 +65,25 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
 
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        LONGITUDE = getResources().getString(R.string.strLongitude);
+        LATITUDE = getResources().getString(R.string.strLatitude);
+        ZOOM = getResources().getString(R.string.strZoom);
+        BEARING = getResources().getString(R.string.strBearing);
+        TILT = getResources().getString(R.string.strTilt);
 
         //Branje lokacij iz datotecnega sistema
         String tabela2 = beriIzDatoteke(filename);
-        Log.i(TAG, "Marko123" + tabela2);
         String[] tabela3 = tabela2.split("%");
         String[][] tabela4 = new String[tabela3.length][5];
-        //List<String> tabela4 = new ArrayList<String>();
         for (int i = 0; i < tabela3.length; i++) {
             String[] tabelaTMP = tabela3[i].split("#");
             tabela4[i] = tabelaTMP;
         }
         tabela = tabela4;
-        //Log.i(TAG, "Marko123" + tabela[3][0]);
 
+        // Branje tabele najdenih lokacij iz datotecnega sistema
         String tabelaUser2 = beriIzDatoteke(filenameUser);
         String[] tabelaUser3 = tabelaUser2.split("%");
         String[][] tabelaUser4 = new String[tabelaUser3.length][2];
@@ -80,10 +93,7 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         }
         tabelaUser = tabelaUser4;
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-
-
+        // Pridobivanje podatka o trenutni lokaciji + preverjanje dovoljenj
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -115,9 +125,10 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
 
+                                // Ko je aplikacija ponovno zagnana
                                 LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12);
-                                mMap.animateCamera(cameraUpdate);
+                                //mMap.animateCamera(cameraUpdate);
                             }
                         }
                     });
@@ -132,53 +143,45 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
     public void onMapReady(GoogleMap map) {
         mMap = map;
 
+        mapReady = true; // Za preprecevanje napake ob prvem zagonu
 
+        // Pridobivanje podatkov o zadnji poziciji zemljevida
+        SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
+
+        double latitude = sharedPrefs.getFloat(LATITUDE, 0);
+        double longitude = sharedPrefs.getFloat(LONGITUDE, 0);
+        LatLng target = new LatLng(latitude, longitude);
+
+        float zoom = sharedPrefs.getFloat(ZOOM, 0);
+        float bearing = sharedPrefs.getFloat(BEARING, 0);
+        float tilt = sharedPrefs.getFloat(TILT, 0);
+
+        CameraPosition position = new CameraPosition(target, zoom, tilt, bearing);
+        CameraUpdate update = CameraUpdateFactory.newCameraPosition(position);
+
+        mMap.moveCamera(update);
+
+        // Prikaz uporabnikove lokacije na zemljevidu (modra pika)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted
         }
         else{
             mMap.setMyLocationEnabled(true);
-
-
         }
 
-        for(int i = 0; i < tabela.length; i++) {
-
-            if(tabelaUser[i][1].equals("1")) {
-                Marker newmarker = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
-                        .title(tabela[i][1])
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                newmarker.setTag(0);
-            }
-            else {
-                Marker newmarker = map.addMarker(new MarkerOptions()
-                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
-                        .title(tabela[i][1])
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-                newmarker.setTag(0);
-            }
-
-
-        }
-
-        //mMap.setOnMarkerClickListener(this);
+        postaviMarkerje();
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                // TODO
-                Log.i(TAG, "Title: " + marker.getTitle());
-
                 prikaziPodrobnosti(marker.getTitle());
             }
         });
     }
 
+    // Zagon skenerja QR kod
     public void scanBarcode(View v) {
-        //Intent intent = new Intent(this, ScanBarcodeActivity.class);
-        //startActivityForResult(intent, 0);
 
         final Activity activity = this;
         IntentIntegrator integrator = new IntentIntegrator(activity);
@@ -191,29 +194,14 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         integrator.setBarcodeImageEnabled(false);
         integrator.initiateScan();
     }
-    /* Nacin za QR ki se trenutno ne uporablja
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==0) {
-            if(resultCode == CommonStatusCodes.SUCCESS) {
-                if(data!=null) {
-                    Barcode barcode = data.getParcelableExtra("barcode");
-                    Intent intent = new Intent(this, ResultActivity.class);
-                    intent.putExtra("barcode", barcode.displayValue);
-                    startActivity(intent);
-                }
-            }
-        }
-        else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }*/
+
+    // Upravljanje rezultata skeniranja QR kode
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null){
             if(result.getContents()==null) {
-                Toast.makeText(this, "Prekinili ste skeniranje", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.strPrekinjenoSkeniranje), Toast.LENGTH_LONG).show();
             }
             else{
                 Intent intent = new Intent(this, ResultActivity.class);
@@ -227,40 +215,20 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
 
     }
 
+    // Prehod na aktivnost s seznamom lokacij
     public void showList(View v) {
         Intent intent = new Intent(this, MainActivity.class);
-        //intent.putExtra("barcode", barcode);
         startActivity(intent);
     }
 
-    @Override
-    public boolean onMarkerClick(final Marker marker) {
-
-        // Retrieve the data from the marker.
-        Integer clickCount = (Integer) marker.getTag();
-
-        // Check if a click count was set, then display the click count.
-        if (clickCount != null) {
-            clickCount = clickCount + 1;
-            marker.setTag(clickCount);
-            Toast.makeText(this,
-                    marker.getTitle() +
-                            " has been clicked " + clickCount + " times.",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-        // Return false to indicate that we have not consumed the event and that we wish
-        // for the default behavior to occur (which is for the camera to move such that the
-        // marker is centered and for the marker's info window to open, if it has one).
-        return false;
-    }
-
+    // Prikaz podrobnosti lokacije ob kliku na ime nad markerjem
     public void prikaziPodrobnosti(String imeLokacije) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("ime_lokacije", imeLokacije);
         startActivity(intent);
     }
 
+    // Upravljenje z dovoljenjem za uporabo lokacije
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -269,17 +237,17 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request.
         }
     }
 
@@ -301,5 +269,50 @@ public class MapsActivity extends FragmentActivity implements GoogleMap.OnMarker
         String vsebina = new String(bytes);
 
         return vsebina;
+    }
+
+    private void postaviMarkerje() {
+        for(int i = 0; i < tabela.length; i++) {
+
+            if(tabelaUser[i][1].equals("1")) {
+                Marker newmarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
+                        .title(tabela[i][1])
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                newmarker.setTag(0);
+            }
+            else {
+                Marker newmarker = mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(Double.parseDouble(tabela[i][3]), Double.parseDouble(tabela[i][4])))
+                        .title(tabela[i][1])
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                newmarker.setTag(0);
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Shranjevanje trenutne pozicije zemljevida
+        if(mapReady) {
+            try{
+                SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
+
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                CameraPosition position = mMap.getCameraPosition();
+
+                editor.putFloat(LATITUDE, (float) position.target.latitude);
+                editor.putFloat(LONGITUDE, (float) position.target.longitude);
+                editor.putFloat(ZOOM, position.zoom);
+                editor.putFloat(TILT, position.tilt);
+                editor.putFloat(BEARING, position.bearing);
+                editor.apply();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

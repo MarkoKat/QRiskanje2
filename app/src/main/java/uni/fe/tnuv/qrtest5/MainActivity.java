@@ -52,13 +52,17 @@ import java.util.Collections;
 import java.util.List;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     //komentar za testirat github
     //Markotov komentar
     //branch test n
-    //branch test d
     private DatabaseReference mDatabase;
     private ArrayList<LocationInfo> allLocations;
     private static final String TAG = "MainActivity";
@@ -117,46 +121,14 @@ public class MainActivity extends AppCompatActivity {
         container = (SwipeRefreshLayout) findViewById(R.id.container);
         container.setOnRefreshListener(mOnRefreshListener);
 
-        //samo zacasni tabeli
-        String[][] tabela = {
-                {"123456", "Fakulteta za elektrotehniko", "Namig, ki ga ni, ali pa ga samo ne vidiš", "46.044783", "14.489494"},
-                {"111111", "Prešernov spomenik", "Tudi tu ni namioga", "46.051389", "14.506317"},
-                {"000001", "Stari grad smlednik :D", "Za tisto sivo skalo", "46.165446", "14.442362"}};
-
-        String[][] tabelaUser = {
-                {"123456", "0"},
-                {"111111", "0"},
-                {"000001", "0"}
-        };
-
         String tabelaUser2;
-        /*
-        //Pretvarjanje tabele v en String
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < tabela.length; i++) {
-            StringBuilder tmp = new StringBuilder();
-            for (int j = 0; j < tabela[i].length; j++) {
-                tmp.append(tabela[i][j]).append("#");
-            }
-            sb.append(tmp).append("%");
-        }
-
-
-        datotecni.vpisiVDatoteko(filename, sb.toString());
-        */
-
-
-
-
-
-
 
         //prebere podatke v allLocations iz sharedPreferences
         loadLocations();
-        //Log.i(TAG, allLocations.toString());
         LocationInfo tmpLoc = new LocationInfo();
-        Log.i(TAG, "Marko345" + allLocations.size());
 
+
+        /*
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < allLocations.size(); i++) {
 
@@ -165,11 +137,13 @@ public class MainActivity extends AppCompatActivity {
                     + allLocations.get(i).getOpis() + "#"
                     + allLocations.get(i).getLat() + "#"
                     + allLocations.get(i).getLng() + "#" + "%";
-            Log.i(TAG, "Marko345" + tmp);
+            //Log.i(TAG, "Marko345" + tmp);
             sb.append(tmp);
 
         }
         vpisiVDatoteko(filename, sb.toString());
+        */
+        posodobiLokalnoTabeloLokacij(); // Podatke o lokacijah shrani v lokalno tabelo
 
         //Pretvarjanje enega stringa v tabelo
         String tabela2 = beriIzDatoteke(filename);
@@ -180,13 +154,9 @@ public class MainActivity extends AppCompatActivity {
             String[] tabelaTMP = tabela3[i].split("#");
             tabela4[i] = tabelaTMP;
         }
-        Log.i(TAG, "Marko555" + tabela2);
-
-
-
 
         //Ugotavljanje prvega zagona aplikacije
-        final String PREFS_NAME = "MyPrefsFile";
+        final String PREFS_NAME = "PrviZagonFile";
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
@@ -195,51 +165,20 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Comments", "First time");
 
             // first time task
-            // Posodobitev tabele z najdenimi lokacijami
+            // Prva nastavitev tabele z najdenimi lokacijami
             StringBuilder sbUser = new StringBuilder();
             for (int i = 0; i < allLocations.size(); i++) {
-
                 String tmpUser = allLocations.get(i).getuID() + "#" + "0" + "#" + "%";
-
                 sbUser.append(tmpUser);
 
             }
-            Log.i(TAG, "Marko222"+ sbUser.toString());
             vpisiVDatoteko(filenameUser, sbUser.toString());
+
+            settings.edit().putBoolean("my_first_time", false).apply();
         }
         else {
             // Posodobitev tabele z najdenimi lokacijami
-            StringBuilder sbUser = new StringBuilder();
-
-            String tabelaUser22 = beriIzDatoteke(filenameUser);
-            String[] tabelaUser3 = tabelaUser22.split("%");
-            String[][] tabelaUser4 = new String[tabelaUser3.length][2];
-            for (int m = 0; m < tabelaUser3.length; m++) {
-                String[] tabelaUserTMP = tabelaUser3[m].split("#");
-                tabelaUser4[m] = tabelaUserTMP;
-            }
-
-            for (int i = 0; i < allLocations.size(); i++) {
-                String tmpUser = "";
-                //String tmpUser = allLocations.get(i).getuID() + "#" + "0" + "#" + "%";
-                int ok = 0;
-                for (int n = 0; n < tabelaUser4.length; n++) {
-                    if(allLocations.get(i).getuID().equals(tabelaUser4[n][0])) {
-                        tmpUser = allLocations.get(i).getuID() + "#" + tabelaUser4[n][1] + "#" + "%";
-                        ok = 1;
-                        break;
-                    }
-                }
-                if (ok == 0) {
-                    tmpUser = allLocations.get(i).getuID() + "#" + "0" + "#" + "%";
-                }
-
-                sbUser.append(tmpUser);
-            }
-
-
-            Log.i(TAG, "Marko222"+ sbUser.toString());
-            vpisiVDatoteko(filenameUser, sbUser.toString());
+            posodobiLokalnoTabeloNajdenih();
         }
 
 
@@ -427,6 +366,9 @@ public class MainActivity extends AppCompatActivity {
                     prikaziPodrobnosti(selectedLocation.getIme());
                 }
             });
+            // Posodobitev podatkov o lokacijah v datotecnem sistemu
+            posodobiLokalnoTabeloLokacij();
+            posodobiLokalnoTabeloNajdenih();
         }
         else{
             info.setText("Nalagam lokacije...");
@@ -437,6 +379,8 @@ public class MainActivity extends AppCompatActivity {
         if (container.isRefreshing()) {
             container.setRefreshing(false);
         }
+
+
     }
 
     // gumba plus in search v meniju v action bar
@@ -486,7 +430,34 @@ public class MainActivity extends AppCompatActivity {
         integrator.initiateScan();
     }
 
-    // ko se konca skeniranje - prekines ali najdes lokacijo
+    /*
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==0) {
+            if(resultCode == CommonStatusCodes.SUCCESS) {
+                if(data!=null) {
+                    Barcode barcode = data.getParcelableExtra("barcode");
+                    Intent intent = new Intent(this, ResultActivity.class);
+                    intent.putExtra("barcode", barcode.displayValue);
+                    startActivity(intent);
+
+                    /*Barcode barcode = data.getParcelableExtra("barcode");
+                    Log.i(TAG, "Koda2: " + barcode.displayValue);
+                    barcodeResult.setText(barcode.displayValue);*/
+                /*}
+                else {
+                    barcodeResult.setText("QR koda ni bila najdena");
+                }
+            }
+        }
+        else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+
+    }
+    */
+
+    // Upravljanje rezultata skeniranja QR kode
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -494,7 +465,7 @@ public class MainActivity extends AppCompatActivity {
             if(result.getContents()==null) {
                 listButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                 scanButton.setBackgroundColor(Color.GRAY);
-                Toast.makeText(this, "Prekinili ste skeniranje", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getResources().getString(R.string.strPrekinjenoSkeniranje), Toast.LENGTH_LONG).show();
             }
             else{
                 listButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
@@ -510,10 +481,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // prikaze zemlejvid
+    // Prehod na aktivnost z zemljevidom
     public void showMaps(View v) {
         Intent intent = new Intent(this, MapsActivity.class);
-        //intent.putExtra("barcode", barcode);
         startActivity(intent);
         mapButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         listButton.setBackgroundColor(Color.GRAY);
@@ -732,4 +702,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private void posodobiLokalnoTabeloLokacij() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < allLocations.size(); i++) {
+
+            String tmp = allLocations.get(i).getuID() + "#"
+                    + allLocations.get(i).getIme() + "#"
+                    + allLocations.get(i).getOpis() + "#"
+                    + allLocations.get(i).getLat() + "#"
+                    + allLocations.get(i).getLng() + "#" + "%";
+            sb.append(tmp);
+        }
+        vpisiVDatoteko(filename, sb.toString());
+    }
+
+    private void posodobiLokalnoTabeloNajdenih() {
+        StringBuilder sbUser = new StringBuilder();
+
+        String tabelaUser22 = beriIzDatoteke(filenameUser);
+        String[] tabelaUser3 = tabelaUser22.split("%");
+        String[][] tabelaUser4 = new String[tabelaUser3.length][2];
+        for (int m = 0; m < tabelaUser3.length; m++) {
+            String[] tabelaUserTMP = tabelaUser3[m].split("#");
+            tabelaUser4[m] = tabelaUserTMP;
+        }
+
+        for (int i = 0; i < allLocations.size(); i++) {
+            String tmpUser = "";
+            int ok = 0;
+            for (int n = 0; n < tabelaUser4.length; n++) {
+                if(allLocations.get(i).getuID().equals(tabelaUser4[n][0])) {
+                    tmpUser = allLocations.get(i).getuID() + "#" + tabelaUser4[n][1] + "#" + "%";
+                    ok = 1;
+                    break;
+                }
+            }
+            if (ok == 0) {
+                tmpUser = allLocations.get(i).getuID() + "#" + "0" + "#" + "%";
+            }
+
+            sbUser.append(tmpUser);
+        }
+
+        vpisiVDatoteko(filenameUser, sbUser.toString());
+    }
 }
