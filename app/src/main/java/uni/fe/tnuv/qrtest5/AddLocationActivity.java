@@ -221,10 +221,20 @@ public class AddLocationActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Prosimo vnesite veljavne koordinate!", Toast.LENGTH_SHORT).show();
             }
             else{
-                // funckija generira in vrne random string sestavljen iz črk in velikih ter malih črk
-                /** POTREBNO PREVERIT CE uID ZE OBSTAJA, DAT WHILE ZANKO*/
-                uID = generateuID();
-
+                // preveri ce uID ze obstaja v bazi, ki jo ima
+                Boolean idAlreadyExists = true;
+                while (idAlreadyExists){
+                    // funckija generira in vrne random string sestavljen iz črk in velikih ter malih črk
+                    uID = generateuID();
+                    idAlreadyExists = false;
+                    for (int i = 0; i<allLocations.size(); i++){
+                        String currId = allLocations.get(i).getuID();
+                        if(uID.matches(currId)){
+                            idAlreadyExists = true;
+                        }
+                    }
+                }
+                // zapis v bazo
                 writeNewLokacija(uID ,imeET.getText().toString(), opisET.getText().toString(), Float.valueOf(latET.getText().toString()), Float.valueOf(lngET.getText().toString()));
             }
         }

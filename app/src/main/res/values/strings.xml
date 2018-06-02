@@ -2,4 +2,5 @@
     <string name="app_name">QRtest5</string>
     <string name="datotekaZVsebino">podatki.txt</string>
     <string name="datotekaZVsebinoUser">user.txt</string>
+    <string name="add_activity_name">Dodaj novo lokacijo</string>
 </resources>

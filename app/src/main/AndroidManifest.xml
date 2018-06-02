@@ -40,7 +40,9 @@
             android:value="AIzaSyDvItnYo6KFdAgP6V2temCUnJmvLmLUx5U" />
 
         <activity android:name=".DetailActivity" />
-        <activity android:name=".AddLocationActivity"></activity>
+        <activity android:name=".AddLocationActivity"
+            android:label="@string/add_activity_name">
+        </activity>
     </application>
 
 </manifest>
