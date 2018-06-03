@@ -2,48 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="60dp"
     >
 
-
     <TextView
-        android:gravity="center"
-        android:textAlignment="center"
+        android:paddingStart="10dp"
+        android:paddingEnd="5dp"
+        android:textSize="18sp"
+        android:textColor="@color/matteBlackText"
+        android:gravity="center_vertical"
         android:text="Ime lokacije"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="fill_parent"
         android:id="@+id/location_name"
-        android:layout_weight="4"/>
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="4">
-
-        <TextView
-            android:gravity="center"
-            android:text="Lat"
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:id="@+id/location_lat"/>
-
-        <TextView
-            android:gravity="center"
-            android:text="Lng"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:id="@+id/location_lng"
-            android:layout_below="@+id/location_lat"/>
-    </LinearLayout>
+        android:layout_weight="1"/>
     <TextView
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:gravity="center"
         android:textAlignment="center"
         android:text="500m"
+        android:textColor="@color/darkGreyText"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="fill_parent"
         android:id="@+id/location_distance"
-        android:layout_weight="5"/>
+        android:layout_weight="4"
+        android:autoSizeMaxTextSize="18dp"
+        android:autoSizeTextType="uniform"/>
+
+
+
+
 
 
 </LinearLayout>

@@ -5,6 +5,7 @@ public class LocationInfo {
     public String uID;
     public String ime;
     public String opis;
+    public String namig;
     public float lat;
     public float lng;
     public float dist = -1;
@@ -27,6 +28,14 @@ public class LocationInfo {
 
     public void setOpis(String opis) {
         this.opis = opis;
+    }
+
+    public String getNamig() {
+        return namig;
+    }
+
+    public void setNamig(String namig) {
+        this.namig = namig;
     }
 
     public float getLat() {
@@ -60,4 +69,5 @@ public class LocationInfo {
     public float getDist(){
         return this.dist;
     }
+
 }

@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/ime"
         android:hint="Ime"
-        android:maxLength="100"
+        android:inputType="text"
+        android:maxLength="50"
         />
 
     <EditText
@@ -23,6 +24,14 @@
         android:maxLines="5"
         android:gravity="top"
         android:maxLength="2000"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/namig"
+        android:hint="Namig"
+        android:maxLength="100"
+        android:inputType="text"
+        />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -75,6 +84,6 @@
         android:clickable="false"
         android:textColor="@android:color/white"
         android:backgroundTint="@color/colorAccent"
-        android:drawableLeft="@drawable/ic_file_download_white_24dp"
+        android:drawableStart="@drawable/ic_file_download_white_24dp"
         />
 </LinearLayout>

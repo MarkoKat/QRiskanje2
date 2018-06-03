@@ -64,6 +64,7 @@ public class AddLocationActivity extends AppCompatActivity {
 
     private EditText imeET;
     private EditText opisET;
+    private EditText namigET;
     private EditText latET;
     private EditText lngET;
     private CheckBox manualGps;
@@ -96,6 +97,7 @@ public class AddLocationActivity extends AppCompatActivity {
         //pridobi EditText it layout-a
         imeET = findViewById(R.id.ime);
         opisET = findViewById(R.id.opis);
+        namigET = findViewById(R.id.namig);
         latET = findViewById(R.id.lat);
         lngET = findViewById(R.id.lng);
         manualGps = findViewById(R.id.use_gps);
@@ -213,7 +215,7 @@ public class AddLocationActivity extends AppCompatActivity {
     public void poslji(View view){
 
         // preveri ce so izpolnjeni vsi podatki
-        if (imeET.getText().toString().matches("") || opisET.getText().toString().matches("") || latET.getText().toString().matches("") || lngET.getText().toString().matches("") ){
+        if (imeET.getText().toString().matches("") || opisET.getText().toString().matches("") || namigET.getText().toString().matches("")  || latET.getText().toString().matches("") || lngET.getText().toString().matches("") ){
             Toast.makeText(getApplicationContext(), "Prosimo izpolnite vse podatke!", Toast.LENGTH_SHORT).show();
         }
         else{
@@ -235,15 +237,16 @@ public class AddLocationActivity extends AppCompatActivity {
                     }
                 }
                 // zapis v bazo
-                writeNewLokacija(uID ,imeET.getText().toString(), opisET.getText().toString(), Float.valueOf(latET.getText().toString()), Float.valueOf(lngET.getText().toString()));
+                writeNewLokacija(uID ,imeET.getText().toString(), opisET.getText().toString(), namigET.getText().toString(), Float.valueOf(latET.getText().toString()), Float.valueOf(lngET.getText().toString()));
             }
         }
     }
 
-    private void writeNewLokacija(String lokacijaId, String ime, String opis, float lat, float lng) {
+    private void writeNewLokacija(String lokacijaId, String ime, String opis, String namig, float lat, float lng) {
         LocationInfo lok = new LocationInfo();
         lok.setIme(ime);
         lok.setOpis(opis);
+        lok.setNamig(namig);
         lok.setLat(lat);
         lok.setLng(lng);
 
@@ -257,6 +260,7 @@ public class AddLocationActivity extends AppCompatActivity {
             //ponastavimo vsa vnosna polja
             imeET.setText(null);
             opisET.setText(null);
+            namigET.setText(null);
             if (!manualGps.isChecked()){
                 latET.setText(null);
                 lngET.setText(null);
@@ -271,7 +275,7 @@ public class AddLocationActivity extends AppCompatActivity {
 
             loadLocations();
         } else {
-            /** Internet is NOT available */
+            // Internet is NOT available
             Toast.makeText(getApplicationContext(), "Internetna povezava ni na voljo - lokacija ni bila poslana", Toast.LENGTH_LONG).show();
         }
 

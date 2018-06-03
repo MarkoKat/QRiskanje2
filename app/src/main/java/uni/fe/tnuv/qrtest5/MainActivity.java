@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private String filename; //za lokalno shranjevanje podatkov o lokacijah
     private String filenameUser; //za shranjevanje podatkov o že najdenih QR kodah
+    private String[][] tabelaUser;
     private TextView info;
 
     private SwipeRefreshLayout container;
@@ -83,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton listButton;
     private ImageButton scanButton;
     private ImageButton mapButton;
+
+    private ListView seznamLokacij;
 
     private EditText searchInput;
     private ImageButton stopSearchButton;
@@ -117,8 +120,32 @@ public class MainActivity extends AppCompatActivity {
         searchInput = findViewById(R.id.search_input);
         stopSearchButton = findViewById(R.id.stop_search);
 
+        seznamLokacij = findViewById(R.id.list_view);
+        seznamLokacij.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
+            public void onSwipeRight() {
+                if(!displayingAllLocations){
+                    displayingAllLocations = true;
+                    updateLocationList();
+                    listAllLocations.setClickable(false);
+                    listFoundLocations.setClickable(true);
+                    listAllLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    listFoundLocations.setBackgroundColor(Color.GRAY);
+                }
+            }
+            public void onSwipeLeft() {
+                if(displayingAllLocations){
+                    displayingAllLocations = false;
+                    updateLocationList();
+                    listAllLocations.setClickable(true);
+                    listFoundLocations.setClickable(false);
+                    listFoundLocations.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    listAllLocations.setBackgroundColor(Color.GRAY);
+                }
+            }
+        });
+
         // refresh od swipanju
-        container = (SwipeRefreshLayout) findViewById(R.id.container);
+        container = findViewById(R.id.container);
         container.setOnRefreshListener(mOnRefreshListener);
 
         String tabelaUser2;
@@ -194,6 +221,7 @@ public class MainActivity extends AppCompatActivity {
                         LocationInfo currentLoc = new LocationInfo();
                         currentLoc.setIme(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getIme());
                         currentLoc.setOpis(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getOpis());
+                        currentLoc.setNamig(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getNamig());
                         currentLoc.setLat(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getLat());
                         currentLoc.setLng(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getLng());
                         currentLoc.setuID(ds.getKey());
@@ -202,17 +230,26 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 allLocations = currLocationsList;
-                toBeFoundLocations = allLocations;
-                foundLocations = allLocations;
 
+
+                if(tabelaUser != null && tabelaUser.length == allLocations.size()) {
+                    foundLocations = new ArrayList<>();
+                    toBeFoundLocations = new ArrayList<>();
+                    for (int i = 0; i < allLocations.size(); i++) {
+
+                        if (tabelaUser[i][1].equals("1")) {
+                            foundLocations.add(allLocations.get(i));
+                        } else {
+                            toBeFoundLocations.add(allLocations.get(i));
+                        }
+                    }
+                }
+                else{
+                    toBeFoundLocations = allLocations;
+                    foundLocations = new ArrayList<>();
+                }
 
                 saveLocations();
-
-                /** TUKAJ DODAJ DELITEV V ISKANE IN ZE NAJDENE LOKACIJE*/
-
-
-
-
 
             }
 
@@ -295,6 +332,9 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if(displayingLocations.isEmpty()){
                     info.setText("Za prenos lokacij je potrebna internetna povezava!");
+                    if(!foundLocations.isEmpty()){
+                        info.setText("Čestitamo, odkrili ste že vse lokacije!");
+                    }
                 }
             }
             else{
@@ -414,19 +454,24 @@ public class MainActivity extends AppCompatActivity {
     public void scanBarcode(View v) {
         //Intent intent = new Intent(this, ScanBarcodeActivity.class);
         //startActivityForResult(intent, 0);
-        scanButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-        listButton.setBackgroundColor(Color.GRAY);
+        if(!allLocations.isEmpty()){
+            scanButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            listButton.setBackgroundColor(Color.GRAY);
 
-        final Activity activity = this;
-        IntentIntegrator integrator = new IntentIntegrator(activity);
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-        integrator.setPrompt("");
-        integrator.setCameraId(0);
-        integrator.setOrientationLocked(false);
+            final Activity activity = this;
+            IntentIntegrator integrator = new IntentIntegrator(activity);
+            integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+            integrator.setPrompt("");
+            integrator.setCameraId(0);
+            integrator.setOrientationLocked(false);
 
-        integrator.setBeepEnabled(false);
-        integrator.setBarcodeImageEnabled(false);
-        integrator.initiateScan();
+            integrator.setBeepEnabled(false);
+            integrator.setBarcodeImageEnabled(false);
+            integrator.initiateScan();
+        }
+        else{
+            Toast.makeText(this, "Seznam lokacij je prazen!", Toast.LENGTH_LONG).show();
+        }
     }
 
     // Upravljanje rezultata skeniranja QR kode
@@ -442,6 +487,7 @@ public class MainActivity extends AppCompatActivity {
             else{
                 listButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                 scanButton.setBackgroundColor(Color.GRAY);
+
                 Intent intent = new Intent(this, ResultActivity.class);
                 intent.putExtra("barcode", result.getContents());
                 startActivity(intent);
@@ -516,25 +562,39 @@ public class MainActivity extends AppCompatActivity {
 
     // prebere podatke iz sharedPreferences in jih vrne v obliki ArrayList<LocationInfo>
     private void loadLocations(){
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = sharedPreferences.getString("locationList", null);
-        Type type = new TypeToken<ArrayList<LocationInfo>>() {}.getType();
-        allLocations = gson.fromJson(json, type);
+        if(allLocations == null || allLocations.isEmpty()) {
+            SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("locationList", null);
+            Type type = new TypeToken<ArrayList<LocationInfo>>() {
+            }.getType();
+            allLocations = gson.fromJson(json, type);
 
-        if (allLocations == null){
-            allLocations = new ArrayList<>();
-            foundLocations = new ArrayList<>();
-            toBeFoundLocations = new ArrayList<>();
-        }
-        else{
-            /** TUKAJ DODAJ DELITEV V ISKANE IN ZE NAJDENE LOKACIJE*/
-            toBeFoundLocations = allLocations;
-            // se prikaze samo prva lokacija v seznamu trenutno
-            foundLocations = allLocations;
-        }
-        if (!prikazanSeznam){
-            updateLocationList();
+
+            if (allLocations == null) {
+                allLocations = new ArrayList<>();
+                foundLocations = new ArrayList<>();
+                toBeFoundLocations = new ArrayList<>();
+            } else {
+                if (tabelaUser != null && tabelaUser.length == allLocations.size()) {
+                    foundLocations = new ArrayList<>();
+                    toBeFoundLocations = new ArrayList<>();
+                    for (int i = 0; i < allLocations.size(); i++) {
+
+                        if (tabelaUser[i][1].equals("1")) {
+                            foundLocations.add(allLocations.get(i));
+                        } else {
+                            toBeFoundLocations.add(allLocations.get(i));
+                        }
+                    }
+                } else {
+                    toBeFoundLocations = allLocations;
+                    foundLocations = new ArrayList<>();
+                }
+            }
+            if (!prikazanSeznam) {
+                updateLocationList();
+            }
         }
     }
 
@@ -698,6 +758,19 @@ public class MainActivity extends AppCompatActivity {
         for (int m = 0; m < tabelaUser3.length; m++) {
             String[] tabelaUserTMP = tabelaUser3[m].split("#");
             tabelaUser4[m] = tabelaUserTMP;
+        }
+        tabelaUser = tabelaUser4;
+        if(tabelaUser != null && tabelaUser.length == allLocations.size()) {
+            foundLocations = new ArrayList<>();
+            toBeFoundLocations = new ArrayList<>();
+            for (int i = 0; i < allLocations.size(); i++) {
+
+                if (tabelaUser[i][1].equals("1")) {
+                    foundLocations.add(allLocations.get(i));
+                } else {
+                    toBeFoundLocations.add(allLocations.get(i));
+                }
+            }
         }
 
         for (int i = 0; i < allLocations.size(); i++) {
