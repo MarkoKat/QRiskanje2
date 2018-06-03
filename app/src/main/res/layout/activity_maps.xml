@@ -7,6 +7,19 @@
     tools:context=".MapsActivity">
 
 
+    <TextView
+        android:id="@+id/mapsInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/pick_activity"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/map"
+        android:gravity="center"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -46,7 +59,7 @@
             android:layout_height="40dp"
             android:id="@+id/button_maps"
             android:src="@drawable/ic_map_white_24dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorPrimaryDark"
             android:autoSizeTextType="uniform"
             android:layout_weight="1"
             />

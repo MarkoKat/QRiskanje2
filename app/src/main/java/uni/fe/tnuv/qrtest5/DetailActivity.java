@@ -10,10 +10,12 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +28,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Stack;
 
 import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
@@ -40,10 +43,18 @@ public class DetailActivity extends AppCompatActivity {
 
     public int trenutnaKoda;
 
+    private static final String TAG = "DetailActivity";
+
+    public static Stack<Class<?>> parents = new Stack<Class<?>>();
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
@@ -184,5 +195,33 @@ public class DetailActivity extends AppCompatActivity {
 
     public String getEmojiByUnicode(int unicode){
         return new String(Character.toChars(unicode));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+
+            case android.R.id.home:
+                Intent intent = getIntent();
+                String parent = intent.getStringExtra("parentAct");
+                parent =  parent.substring(6,parent.length());
+                Class prej = MainActivity.class;
+
+                try {
+                    prej = Class.forName(parent);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                Intent parentActivityIntent = new Intent(this, prej);
+                parentActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(parentActivityIntent);
+                finish();
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

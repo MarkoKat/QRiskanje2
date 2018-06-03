@@ -11,5 +11,6 @@
     <string name="strBearing">bearing</string>
     <string name="strTilt">tilt</string>
     <string name="strPrekinjenoSkeniranje">Prekinili ste skeniranje!</string>
-    <string name="nazajNaSeznam">NAZAJ NA SEZNAM</string>
+    <string name="nazajNaSeznam">NAZAJ</string>
+    <string name="gumbPodrobnosti">PODROBNOSTI</string>
 </resources>

@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -38,6 +39,7 @@ import com.google.zxing.integration.android.IntentResult;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Stack;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -59,6 +61,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String BEARING = "bearing";
     private String TILT = "tilt";
 
+    public static Stack<Class<?>> parents = new Stack<Class<?>>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +70,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LinearLayout pickActivity = (LinearLayout) findViewById(R.id.pick_activity);
         pickActivity.bringToFront();
+
+        parents.push(getClass());
 
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
@@ -128,19 +134,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
+                                SharedPreferences sharedPrefs = getSharedPreferences("zagon", 0);
 
-                                // Ko je aplikacija ponovno zagnana
-                                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12);
-                                //mMap.animateCamera(cameraUpdate);
+                                int zagon = sharedPrefs.getInt("zagon2", 1);
+
+                                if(zagon == 1) {
+                                    Log.v(TAG, "MarkoSplashGPS - " + zagon);
+                                    // Ko je aplikacija ponovno zagnana
+                                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12);
+                                    mMap.animateCamera(cameraUpdate);
+
+                                    SharedPreferences.Editor editor = sharedPrefs.edit();
+
+                                    editor.putInt("zagon2", 0);
+                                    editor.apply();
+                                }
                             }
                         }
                     });
         }
 
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+
+
+        if (AppNetworkStatus.getInstance(getApplicationContext()).isOnline()) {
+            SupportMapFragment mapFragment =
+                    (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+        }
+        else {
+            TextView mapInfo = findViewById(R.id.mapsInfo);
+            mapInfo.setText("Za prenos lokacij je potrebna internetna povezava!");
+            mapInfo.bringToFront();
+        }
     }
 
     @Override
@@ -151,19 +177,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Pridobivanje podatkov o zadnji poziciji zemljevida
         SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs2 = getSharedPreferences("zagon", 0);
 
-        double latitude = sharedPrefs.getFloat(LATITUDE, 0);
-        double longitude = sharedPrefs.getFloat(LONGITUDE, 0);
-        LatLng target = new LatLng(latitude, longitude);
+        int zagon = sharedPrefs2.getInt("zagon2", 1);
 
-        float zoom = sharedPrefs.getFloat(ZOOM, 0);
-        float bearing = sharedPrefs.getFloat(BEARING, 0);
-        float tilt = sharedPrefs.getFloat(TILT, 0);
+        if(zagon == 0) {
+            Log.v(TAG, "MarkoSplash2 - " + zagon);
+            double latitude = sharedPrefs.getFloat(LATITUDE, 0);
+            double longitude = sharedPrefs.getFloat(LONGITUDE, 0);
+            LatLng target = new LatLng(latitude, longitude);
 
-        CameraPosition position = new CameraPosition(target, zoom, tilt, bearing);
-        CameraUpdate update = CameraUpdateFactory.newCameraPosition(position);
+            float zoom = sharedPrefs.getFloat(ZOOM, 0);
+            float bearing = sharedPrefs.getFloat(BEARING, 0);
+            float tilt = sharedPrefs.getFloat(TILT, 0);
 
-        mMap.moveCamera(update);
+            CameraPosition position = new CameraPosition(target, zoom, tilt, bearing);
+            CameraUpdate update = CameraUpdateFactory.newCameraPosition(position);
+
+            mMap.moveCamera(update);
+        }
+
 
         // Prikaz uporabnikove lokacije na zemljevidu (modra pika)
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -229,6 +262,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void prikaziPodrobnosti(String imeLokacije) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("ime_lokacije", imeLokacije);
+        intent.putExtra("parentAct", getClass().toString());
         startActivity(intent);
     }
 
