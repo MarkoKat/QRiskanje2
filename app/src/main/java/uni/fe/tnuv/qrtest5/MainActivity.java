@@ -63,9 +63,6 @@ import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity {
 
-    //komentar za testirat github
-    //Markotov komentar
-    //branch test n
     private DatabaseReference mDatabase;
     private ArrayList<LocationInfo> allLocations;
     private static final String TAG = "MainActivity";
@@ -165,22 +162,6 @@ public class MainActivity extends AppCompatActivity {
         loadLocations();
         LocationInfo tmpLoc = new LocationInfo();
 
-
-        /*
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < allLocations.size(); i++) {
-
-            String tmp = allLocations.get(i).getuID() + "#"
-                    + allLocations.get(i).getIme() + "#"
-                    + allLocations.get(i).getOpis() + "#"
-                    + allLocations.get(i).getLat() + "#"
-                    + allLocations.get(i).getLng() + "#" + "%";
-            //Log.i(TAG, "Marko345" + tmp);
-            sb.append(tmp);
-
-        }
-        vpisiVDatoteko(filename, sb.toString());
-        */
         posodobiLokalnoTabeloLokacij(); // Podatke o lokacijah shrani v lokalno tabelo
 
         //Pretvarjanje enega stringa v tabelo
@@ -772,7 +753,9 @@ public class MainActivity extends AppCompatActivity {
                     + allLocations.get(i).getIme() + "#"
                     + allLocations.get(i).getOpis() + "#"
                     + allLocations.get(i).getLat() + "#"
-                    + allLocations.get(i).getLng() + "#" + "%";
+                    + allLocations.get(i).getLng() + "#"
+                    + allLocations.get(i).getNamig() + "#"
+                    + allLocations.get(i).getNaslov() + "#" + "%";
             sb.append(tmp);
         }
         vpisiVDatoteko(filename, sb.toString());

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -14,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,6 +63,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String BEARING = "bearing";
     private String TILT = "tilt";
 
+    private ImageButton listButton;
+    private ImageButton scanButton;
+    private ImageButton mapButton;
+
     private String ZAGON;
     private String ZAGON2;
 
@@ -88,6 +94,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         ZAGON = getResources().getString(R.string.strZagon);
         ZAGON2 = getResources().getString(R.string.strZagon2);
+
+        listButton = findViewById(R.id.button_list);
+        scanButton = findViewById(R.id.scan_barcode);
+        mapButton = findViewById(R.id.button_maps);
 
         //Branje lokacij iz datotecnega sistema
         String tabela2 = beriIzDatoteke(filename);
@@ -221,6 +231,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Zagon skenerja QR kod
     public void scanBarcode(View v) {
+        mapButton.setBackgroundColor(Color.GRAY);
+        scanButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
 
         final Activity activity = this;
         IntentIntegrator integrator = new IntentIntegrator(activity);
@@ -256,6 +268,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Prehod na aktivnost s seznamom lokacij
     public void showList(View v) {
+        mapButton.setBackgroundColor(Color.GRAY);
+        listButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -354,5 +368,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        listButton.setBackgroundColor(Color.GRAY);
+        scanButton.setBackgroundColor(Color.GRAY);
+        mapButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
     }
 }

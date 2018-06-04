@@ -98,12 +98,14 @@ public class DetailActivity extends AppCompatActivity {
         int ok = 0;
         for(int i = 0; i < tabela.length; i++){
             if(message.equals(tabela[i][1])){
-                textView_opis.setText(tabela[i][2]);
-                // Se namig in kraj
-                /*
-                textView_namig.setText(tabela[i][5]);
-                textView_kraj.setText(tabela[i][6]);
-                 */
+                if(tabela[i][2] != null) { textView_opis.setText(tabela[i][2]); }
+                else { textView_opis.setText(getResources().getString(R.string.napaka)); }
+
+                if(tabela[i][5] != null) { textView_namig.setText(tabela[i][5]); }
+                else { textView_namig.setText(getResources().getString(R.string.napaka)); }
+
+                if(tabela[i][6] != null) { textView_kraj.setText(tabela[i][6]); }
+                else { textView_kraj.setText(getResources().getString(R.string.napaka)); }
 
                 textViewId.setText("ID: " + tabela[i][0]);
                 ok = 1;
