@@ -31,7 +31,7 @@
     <string name="infoLoading">Nalagam lokacije&#8230;</string>
     <string name="infoNoConnection">Za prenos lokacij je potrebna internetna povezava!\"</string>
     <string name="infoFoundAll">Čestitamo, odkrili ste že vse lokacije!</string>
-    <string name="infoFoundNone">Odkril nisi še nobene lokacije. \\nOdpravi se na pot in skeniraj QR kode!</string>
+    <string name="infoFoundNone">Odkril nisi še nobene lokacije. \nOdpravi se na pot in skeniraj QR kode!</string>
     <string name="infoNoneFound">Ne najdem lokacij!</string>
     <string name="toastNoLoactionsToScan">Seznam lokacij je prazen!</string>
     <string name="editTextSearch">Išči lokacijo</string>
@@ -48,4 +48,8 @@
     <string name="descList">Seznam lokacij</string>
     <string name="descScan">Skeniraj</string>
     <string name="descMap">Zemljevid</string>
+    <string name="toastSuccessUpdate">Lokacija je bila uspešno posodobljena!</string>
+    <string name="toastFailUpdate">Napaka pri posodabljanju lokacije</string>
+    <string name="toastFailUpdateNoConnection">Za posodabljanje lokacije potrebujete internetno povezavo</string>
+    <string name="toastSuccessDelete">Lokacija je bila uspešno izbrisana</string>
 </resources>

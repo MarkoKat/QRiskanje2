@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:padding="15dp"
         android:layout_gravity="center_horizontal"
+        android:textAlignment="center"
         android:textColor="@color/matteBlackText"
         android:id="@+id/qr_code"
         />
