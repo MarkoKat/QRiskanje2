@@ -228,7 +228,9 @@ public class MainActivity extends AppCompatActivity {
                     foundLocations = new ArrayList<>();
                     toBeFoundLocations = new ArrayList<>();
                     for (int i = 0; i < allLocations.size(); i++) {
-                        if (tabelaUser[i][1].equals("1")) {
+                        Log.d("TABELAUS", tabelaUser[0][0].toString());
+
+                        if (tabelaUser[i].length > 1 && tabelaUser[i][1].equals("1")) {
                             foundLocations.add(allLocations.get(i));
                         } else {
                             toBeFoundLocations.add(allLocations.get(i));
@@ -311,6 +313,8 @@ public class MainActivity extends AppCompatActivity {
 
     // ko swipas updata list
     public void updateLocationList(){
+        posodobiLokalnoTabeloLokacij();
+        posodobiLokalnoTabeloNajdenih();
         if (toBeFoundLocations != null && foundLocations != null){
             if (!prikazanSeznam){
                 prikazanSeznam = true;
@@ -382,6 +386,10 @@ public class MainActivity extends AppCompatActivity {
                 Collections.sort(displayingLocations, new LocationNameComparator());
             }
 
+            // Posodobitev podatkov o lokacijah v datotecnem sistemu
+
+
+
             ListView  mListView = findViewById(R.id.list_view);
             LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, displayingLocations);
             mListView.setAdapter(adapter);
@@ -394,9 +402,7 @@ public class MainActivity extends AppCompatActivity {
                     prikaziPodrobnosti(selectedLocation.getIme());
                 }
             });
-            // Posodobitev podatkov o lokacijah v datotecnem sistemu
-            posodobiLokalnoTabeloLokacij();
-            posodobiLokalnoTabeloNajdenih();
+
         }
         else{
             info.setText(getResources().getString(R.string.infoLoading));
@@ -589,7 +595,7 @@ public class MainActivity extends AppCompatActivity {
                     toBeFoundLocations = new ArrayList<>();
                     for (int i = 0; i < allLocations.size(); i++) {
 
-                        if (tabelaUser[i][1].equals("1")) {
+                        if (tabelaUser[i].length > 1 &&tabelaUser[i][1].equals("1")) {
                             foundLocations.add(allLocations.get(i));
                         } else {
                             toBeFoundLocations.add(allLocations.get(i));
@@ -657,6 +663,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        posodobiLokalnoTabeloLokacij();
+        posodobiLokalnoTabeloNajdenih();
 
         listButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         scanButton.setBackgroundColor(Color.GRAY);
@@ -777,9 +785,10 @@ public class MainActivity extends AppCompatActivity {
             toBeFoundLocations = new ArrayList<>();
             for (int i = 0; i < allLocations.size(); i++) {
 
-                if (tabelaUser[i][1].equals("1")) {
+                if (tabelaUser[i].length > 1 && tabelaUser[i][1].equals("1")) {
                     foundLocations.add(allLocations.get(i));
-                } else {
+                }
+                 else {
                     toBeFoundLocations.add(allLocations.get(i));
                 }
             }
