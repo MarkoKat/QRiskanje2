@@ -64,4 +64,5 @@
     <string name="alertDeleteTitle">POZOR!</string>
     <string name="alertDeleteConfirm">Izbriši</string>
     <string name="alertDeleteCancel">Prekliči</string>
+    <string name="prikaziZemljevid">PRIKAŽI NA ZEMLJEVIDU</string>
 </resources>
