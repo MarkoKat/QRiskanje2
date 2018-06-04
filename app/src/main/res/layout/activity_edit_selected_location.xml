@@ -100,6 +100,7 @@
             android:layout_gravity="center"
             android:textColor="@android:color/white"
             android:backgroundTint="@color/deleteRed"
+            android:drawableStart="@drawable/ic_delete_white_24dp"
             />
     </LinearLayout>
 </ScrollView>

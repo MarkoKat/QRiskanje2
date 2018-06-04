@@ -1,8 +1,10 @@
 package uni.fe.tnuv.qrtest5;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -175,49 +177,64 @@ public class EditSelectedLocationActivity extends AppCompatActivity {
 
     public void deleteLoc(View view){
         if (AppNetworkStatus.getInstance(getApplicationContext()).isOnline()) {
-            try {
-                mDatabase.child("lokacija").child(lokacijaId).setValue(null);
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastSuccessDelete), Toast.LENGTH_LONG).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true);
+            builder.setTitle(getResources().getString(R.string.alertDeleteTitle));
+            builder.setMessage(getResources().getString(R.string.alertDeleteMessage));
+            builder.setPositiveButton(getResources().getString(R.string.alertDeleteConfirm),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+                                mDatabase.child("lokacija").child(lokacijaId).setValue(null);
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastSuccessDelete), Toast.LENGTH_LONG).show();
 
-                SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
-                Gson gson = new Gson();
-                String json = sharedPreferences.getString("myLocationList", null);
-                Type type = new TypeToken<ArrayList<LocationInfo>>() {
-                }.getType();
-                myLocations = gson.fromJson(json, type);
+                                SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+                                Gson gson = new Gson();
+                                String json = sharedPreferences.getString("myLocationList", null);
+                                Type type = new TypeToken<ArrayList<LocationInfo>>() {
+                                }.getType();
+                                myLocations = gson.fromJson(json, type);
 
-                int indexDel = -1;
-                for(int i= 0; i<myLocations.size(); i++){
-                    if(myLocations.get(i).getuID().equals(lokacijaId)){
-                        indexDel = i;
-                        break;
-                    }
+                                int indexDel = -1;
+                                for(int i= 0; i<myLocations.size(); i++){
+                                    if(myLocations.get(i).getuID().equals(lokacijaId)){
+                                        indexDel = i;
+                                        break;
+                                    }
+                                }
+                                if(indexDel != -1){
+                                    myLocations.remove(indexDel);
+                                }
+
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                gson = new Gson();
+                                json = gson.toJson(myLocations);
+
+                                editor.remove("myLocationList");
+                                editor.commit();
+
+                                editor.putString("myLocationList", json);
+                                editor.apply();
+
+                                Intent intentEdit = new Intent(getApplicationContext(), EditLocationsActivity.class);
+                                startActivity(intentEdit);
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailUpdate), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+            builder.setNegativeButton(getResources().getString(R.string.alertDeleteCancel), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
                 }
-                if(indexDel != -1){
-                    myLocations.remove(indexDel);
-                }
+            });
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                gson = new Gson();
-                json = gson.toJson(myLocations);
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
-                editor.remove("myLocationList");
-                editor.commit();
-
-                editor.putString("myLocationList", json);
-                editor.apply();
-                if(myLocations.isEmpty()){
-                    Intent intentEdit = new Intent(this, MainActivity.class);
-                    startActivity(intentEdit);
-                }
-                else{
-                    Intent intentEdit = new Intent(this, EditLocationsActivity.class);
-                    startActivity(intentEdit);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailUpdate), Toast.LENGTH_LONG).show();
-            }
         } else {
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailUpdateNoConnection), Toast.LENGTH_LONG).show();
         }

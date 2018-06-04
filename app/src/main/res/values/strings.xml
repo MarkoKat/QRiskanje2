@@ -52,4 +52,8 @@
     <string name="toastFailUpdate">Napaka pri posodabljanju lokacije</string>
     <string name="toastFailUpdateNoConnection">Za posodabljanje lokacije potrebujete internetno povezavo</string>
     <string name="toastSuccessDelete">Lokacija je bila uspešno izbrisana</string>
+    <string name="alertDeleteMessage">Ali ste prepričani da želite izbrisati lokacijo?</string>
+    <string name="alertDeleteTitle">POZOR!</string>
+    <string name="alertDeleteConfirm">Izbriši</string>
+    <string name="alertDeleteCancel">Prekliči</string>
 </resources>
