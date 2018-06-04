@@ -9,7 +9,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/ime"
-        android:hint="Ime"
+        android:hint="@string/editTextIme"
+        android:inputType="text"
+        android:maxLength="50"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/naslov"
+        android:hint="@string/editTextNaslov"
         android:inputType="text"
         android:maxLength="50"
         />
@@ -18,17 +26,17 @@
         android:id="@+id/opis"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Opis"
+        android:hint="@string/editTextOpis"
         android:inputType="textMultiLine"
         android:singleLine="false"
         android:maxLines="5"
         android:gravity="top"
-        android:maxLength="2000"/>
+        android:maxLength="1000"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/namig"
-        android:hint="Namig"
+        android:hint="@string/editTextNamig"
         android:maxLength="100"
         android:inputType="text"
         />
@@ -36,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lat"
-        android:hint="Zemljepisna širina (od -90° do +90°)"
+        android:hint="@string/editTextLat"
         android:inputType="numberDecimal|numberSigned"
         android:maxLength="100"
         />
@@ -44,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/lng"
-        android:hint="Zemljepisna dolžina (od -180° do +180°)"
+        android:hint="@string/editTextLng"
         android:inputType="numberDecimal|numberSigned"
         android:maxLength="100"
         />
@@ -54,36 +62,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:checked="false"
-        android:text="Uporabi trenutno lokacijo" />
+        android:text="@string/latLngUseGPS" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Dodaj lokacijo   "
+        android:text="@string/buttonAddLocation"
         android:onClick="poslji"
         android:layout_gravity="center"
         android:textColor="@android:color/white"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:drawableRight="@drawable/ic_send_white_24dp"
-        />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="tukaj bo izpisan id QR kode"
-        android:id="@+id/qr_code"
-        android:visibility="invisible"
-        />
-    <Button
-        android:id="@+id/download_qr_code"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Prenesi QR KODO"
-        android:onClick="prenesiQr"
-        android:layout_gravity="center"
-        android:visibility="invisible"
-        android:clickable="false"
-        android:textColor="@android:color/white"
-        android:backgroundTint="@color/colorAccent"
-        android:drawableStart="@drawable/ic_file_download_white_24dp"
+        android:drawableEnd="@drawable/ic_send_white_24dp"
         />
 </LinearLayout>

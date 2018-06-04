@@ -6,4 +6,5 @@
     <color name="matteBlackText">#212121</color>
     <color name="darkGreyText">#616161</color>
     <color name="lightBackground">#40C4FF</color>
+    <color name="deleteRed">#F44336</color>
 </resources>

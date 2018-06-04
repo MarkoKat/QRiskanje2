@@ -6,12 +6,17 @@
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
-        android:title=""
+        android:title="@string/menuSearch"
         app:showAsAction="always"/>
     <item
         android:id="@+id/action_add"
         android:icon="@drawable/ic_add_white_24dp"
-        android:title=""
-        app:showAsAction="always"/>
+        android:title="@string/menuAdd"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_edit"
+        android:icon="@drawable/ic_edit_white_24dp"
+        android:title="@string/menuEdit"
+        app:showAsAction="ifRoom"/>
 
 </menu>

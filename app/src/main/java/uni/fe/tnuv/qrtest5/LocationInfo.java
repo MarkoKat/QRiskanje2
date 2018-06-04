@@ -4,6 +4,7 @@ public class LocationInfo {
 
     public String uID;
     public String ime;
+    public String naslov;
     public String opis;
     public String namig;
     public float lat;
@@ -20,6 +21,14 @@ public class LocationInfo {
 
     public void setIme(String ime) {
         this.ime = ime;
+    }
+
+    public String getNaslov() {
+        return naslov;
+    }
+
+    public void setNaslov(String naslov) {
+        this.naslov = naslov;
     }
 
     public String getOpis() {

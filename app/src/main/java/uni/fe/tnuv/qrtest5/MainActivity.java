@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,11 +53,6 @@ import java.util.Collections;
 import java.util.List;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -112,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         info = findViewById(R.id.info);
         listAllLocations = findViewById(R.id.all_locations);
         listFoundLocations = findViewById(R.id.found_locations);
+        listFoundLocations.setBackgroundColor(Color.GRAY);
 
         listButton = findViewById(R.id.button_list);
         scanButton = findViewById(R.id.scan_barcode);
@@ -208,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
             posodobiLokalnoTabeloNajdenih();
         }
 
-
         // za bazo
         mDatabase = FirebaseDatabase.getInstance().getReference();
         ValueEventListener postListener = new ValueEventListener() {
@@ -220,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     for (DataSnapshot ds: postSnapshot.getChildren()){
                         LocationInfo currentLoc = new LocationInfo();
                         currentLoc.setIme(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getIme());
+                        currentLoc.setNaslov(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getNaslov());
                         currentLoc.setOpis(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getOpis());
                         currentLoc.setNamig(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getNamig());
                         currentLoc.setLat(postSnapshot.child(ds.getKey()).getValue(LocationInfo.class).getLat());
@@ -231,12 +228,11 @@ public class MainActivity extends AppCompatActivity {
                 }
                 allLocations = currLocationsList;
 
-
+                // loci se na najdene in ne-najdene lokacije
                 if(tabelaUser != null && tabelaUser.length == allLocations.size()) {
                     foundLocations = new ArrayList<>();
                     toBeFoundLocations = new ArrayList<>();
                     for (int i = 0; i < allLocations.size(); i++) {
-
                         if (tabelaUser[i][1].equals("1")) {
                             foundLocations.add(allLocations.get(i));
                         } else {
@@ -248,17 +244,16 @@ public class MainActivity extends AppCompatActivity {
                     toBeFoundLocations = allLocations;
                     foundLocations = new ArrayList<>();
                 }
-
+                // shranimo lokacije v shared preferences
                 saveLocations();
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w("napaka", "loadPost:onCancelled", databaseError.toException());
+                // Getting Post failed, make a message
+                //Log.w("napaka", "loadPost:onCancelled", databaseError.toException());
                 Context context = getApplicationContext();
-                Toast.makeText(context, "napaka", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, getResources().getString(R.string.toastDatabaseError), Toast.LENGTH_SHORT).show();
             }
         };
         mDatabase.addValueEventListener(postListener);
@@ -325,22 +320,22 @@ public class MainActivity extends AppCompatActivity {
             if (!prikazanSeznam){
                 prikazanSeznam = true;
             }
-            if(displayingAllLocations == true){
+            if(displayingAllLocations){
                 displayingLocations = toBeFoundLocations;
                 if (displayingLocations.isEmpty() && AppNetworkStatus.getInstance(getApplicationContext()).isOnline()){
-                    info.setText("Nalagam lokacije...");
+                    info.setText(getResources().getString(R.string.infoLoading));
                 }
                 else if(displayingLocations.isEmpty()){
-                    info.setText("Za prenos lokacij je potrebna internetna povezava!");
+                    info.setText(getResources().getString(R.string.infoNoConnection));
                     if(!foundLocations.isEmpty()){
-                        info.setText("Čestitamo, odkrili ste že vse lokacije!");
+                        info.setText(getResources().getString(R.string.infoFoundAll));
                     }
                 }
             }
             else{
                 displayingLocations = foundLocations;
                 if (displayingLocations.isEmpty()){
-                    info.setText("Odkril nisi še nobene lokacije. \nOdpravi se na pot in skeniraj QR kode!");
+                    info.setText(getResources().getString(R.string.infoFoundNone));
                 }
             }
 
@@ -353,8 +348,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             // ce je kaj v searchinputu se naredi filter kar je notr
-
-            if (searchInput.getText().toString() != "" && !displayingLocations.isEmpty()){
+            if (!searchInput.getText().toString().equals("") && !displayingLocations.isEmpty()){
                 String filter = searchInput.getText().toString();
                 ArrayList<LocationInfo> filteredLocations = new ArrayList<>();
                 for (int i = 0; i < displayingLocations.size(); i++) {
@@ -364,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 displayingLocations = filteredLocations;
                 if (filteredLocations.isEmpty()) {
-                    info.setText("Ne najdem lokacij!");
+                    info.setText(getResources().getString(R.string.infoNoneFound));
                 }
             }
 
@@ -393,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
                 Collections.sort(displayingLocations, new LocationNameComparator());
             }
 
-            ListView  mListView = (ListView) findViewById(R.id.list_view);
+            ListView  mListView = findViewById(R.id.list_view);
             LocationListAdapter  adapter = new LocationListAdapter(this, R.layout.adapter_location_view, displayingLocations);
             mListView.setAdapter(adapter);
             // OnClick na item na seznamu prikaze podrobnosti za lokacijo
@@ -410,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
             posodobiLokalnoTabeloNajdenih();
         }
         else{
-            info.setText("Nalagam lokacije...");
+            info.setText(getResources().getString(R.string.infoLoading));
         }
 
 
@@ -422,27 +416,46 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // gumba plus in search v meniju v action bar
+    // gumba edit, plus in search v meniju v action bar
     @Override
     public boolean onCreateOptionsMenu(Menu menu){
         getMenuInflater().inflate(R.menu.main_activity_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
-    // ko kliknes gumb plus v meniju v action bar se odpre activity
+    // ko kliknes gumb edit aliplus v meniju v action bar se odpre activity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_add:
-                Intent intent = new Intent(this, AddLocationActivity.class);
-                //intent.putExtra("barcode", barcode);
-                startActivity(intent);
+                Intent intentAdd = new Intent(this, AddLocationActivity.class);
+                startActivity(intentAdd);
+                return true;
+            case R.id.action_edit:
+                SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+                Gson gson = new Gson();
+                String json = sharedPreferences.getString("myLocationList", null);
+                Type type = new TypeToken<ArrayList<LocationInfo>>() {
+                }.getType();
+                ArrayList<LocationInfo> myLocations = gson.fromJson(json, type);
+
+                if(myLocations != null && !myLocations.isEmpty()){
+                    Intent intentEdit = new Intent(this, EditLocationsActivity.class);
+                    startActivity(intentEdit);
+                }
+                else{
+                    Toast.makeText(this, getResources().getString(R.string.toastNoMyLocations), Toast.LENGTH_LONG).show();
+                }
                 return true;
             case R.id.action_search:
                 if (searchInput.getVisibility() != View.VISIBLE) {
                     searchInput.setVisibility(View.VISIBLE);
                     stopSearchButton.setVisibility(View.VISIBLE);
+                    // za prikaz tipkovnice ob kliku na search
+                    searchInput.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(searchInput, InputMethodManager.SHOW_IMPLICIT);
                 }
                 return true;
             default:
@@ -470,7 +483,7 @@ public class MainActivity extends AppCompatActivity {
             integrator.initiateScan();
         }
         else{
-            Toast.makeText(this, "Seznam lokacij je prazen!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getResources().getString(R.string.toastNoLoactionsToScan), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -629,7 +642,8 @@ public class MainActivity extends AppCompatActivity {
     public void stopSearch(View view){
         searchInput.setVisibility(View.GONE);
         stopSearchButton.setVisibility(View.GONE);
-
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
         searchInput.setText("");
     }
 
@@ -698,7 +712,7 @@ public class MainActivity extends AppCompatActivity {
 
             List<Location> locationList = locationResult.getLocations();
             if (locationList.size() > 0) {
-                //The last location in the list is the newest
+                //zadnja lokacija na seznamu je ta zadnja
                 Location location = locationList.get(locationList.size() - 1);
                 currLat = location.getLatitude();
                 currLng = location.getLongitude();

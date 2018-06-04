@@ -15,7 +15,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Išči lokacijo"
+            android:hint="@string/editTextSearch"
             android:id="@+id/search_input"
             android:drawableStart="@drawable/ic_search_grey_24dp"
             android:layout_weight="1"
@@ -24,6 +24,7 @@
             android:inputType="text"
             />
         <ImageButton
+            android:contentDescription="@string/descStopSearch"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/stop_search"
@@ -49,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="false"
-            android:text="Seznam iskanih lokacij"
+            android:text="@string/buttonAllLocations"
             android:layout_weight="1"
             android:onClick="displayAllLocations"
             android:background="@color/colorPrimaryDark"
@@ -60,7 +61,7 @@
             android:id="@+id/found_locations"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text="NAJDENE LOKACIJE"
+            android:text="@string/buttonFoundLocations"
             app:layout_constraintStart_toEndOf="@id/all_locations"
             android:layout_weight="1"
             android:onClick="displayFoundLocations"
@@ -82,6 +83,7 @@
         app:layout_constraintStart_toStartOf="parent" >
 
         <ImageButton
+            android:contentDescription="@string/descList"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:id="@+id/button_list"
@@ -93,6 +95,7 @@
             />
 
         <ImageButton
+            android:contentDescription="@string/descScan"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:id="@+id/scan_barcode"
@@ -103,6 +106,7 @@
             android:layout_weight="1"
             />
         <ImageButton
+            android:contentDescription="@string/descMap"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:id="@+id/button_maps"
@@ -112,7 +116,6 @@
             app:layout_constraintStart_toEndOf="@+id/scan_barcode"
             android:layout_weight="1"
             />
-
     </LinearLayout>
 
 
@@ -130,6 +133,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pick_list"
+        android:padding="10dp"
+        android:textSize="15sp"
+        android:textColor="@color/matteBlackText"
         app:layout_constraintVertical_bias="0.0"/>
 
     <android.support.v4.widget.SwipeRefreshLayout

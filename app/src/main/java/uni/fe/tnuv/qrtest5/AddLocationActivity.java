@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -63,13 +64,13 @@ public class AddLocationActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
 
     private EditText imeET;
+    private EditText naslovET;
     private EditText opisET;
     private EditText namigET;
     private EditText latET;
     private EditText lngET;
     private CheckBox manualGps;
-    private TextView qrCode;
-    private Button downloadQr;
+
 
     private String uID;
     private Double currLat;
@@ -81,6 +82,7 @@ public class AddLocationActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 12;
 
     private ArrayList<LocationInfo> allLocations;
+    private ArrayList<LocationInfo> myLocations;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +98,12 @@ public class AddLocationActivity extends AppCompatActivity {
 
         //pridobi EditText it layout-a
         imeET = findViewById(R.id.ime);
+        naslovET = findViewById(R.id.naslov);
         opisET = findViewById(R.id.opis);
         namigET = findViewById(R.id.namig);
         latET = findViewById(R.id.lat);
         lngET = findViewById(R.id.lng);
         manualGps = findViewById(R.id.use_gps);
-        qrCode = findViewById(R.id.qr_code);
-        downloadQr = findViewById(R.id.download_qr_code);
 
         // preberi vse lokacije shranjene v sharedPreferences
         loadLocations();
@@ -114,7 +115,7 @@ public class AddLocationActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
                 // Permission is not granted
                 manualGps.setEnabled(false);
-                manualGps.setText(manualGps.getText().toString()+" - Za vklop omogočite lokacijo");
+                manualGps.setText(getResources().getString(R.string.latLngUseGPSnoSignal));
                 manualGps.setChecked(false);
                 setUseGpsLocation(manualGps.isChecked());
                 foundLastLoc = false;
@@ -135,7 +136,7 @@ public class AddLocationActivity extends AppCompatActivity {
                             }
                             else{
                                 manualGps.setEnabled(false);
-                                manualGps.setText(manualGps.getText().toString()+" - Za vklop omogočite lokacijo");
+                                manualGps.setText(getResources().getString(R.string.latLngUseGPSnoSignal));
                                 manualGps.setChecked(false);
                                 setUseGpsLocation(manualGps.isChecked());
                                 foundLastLoc = false;
@@ -215,12 +216,12 @@ public class AddLocationActivity extends AppCompatActivity {
     public void poslji(View view){
 
         // preveri ce so izpolnjeni vsi podatki
-        if (imeET.getText().toString().matches("") || opisET.getText().toString().matches("") || namigET.getText().toString().matches("")  || latET.getText().toString().matches("") || lngET.getText().toString().matches("") ){
-            Toast.makeText(getApplicationContext(), "Prosimo izpolnite vse podatke!", Toast.LENGTH_SHORT).show();
+        if (imeET.getText().toString().matches("") || naslovET.getText().toString().matches("") || opisET.getText().toString().matches("") || namigET.getText().toString().matches("")  || latET.getText().toString().matches("") || lngET.getText().toString().matches("") ){
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastEnterAllData), Toast.LENGTH_SHORT).show();
         }
         else{
             if (Math.abs(Double.valueOf(latET.getText().toString())) > 90 || Math.abs(Double.valueOf(lngET.getText().toString())) > 180) {
-                Toast.makeText(getApplicationContext(), "Prosimo vnesite veljavne koordinate!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastEnterCorrectCoordinates), Toast.LENGTH_SHORT).show();
             }
             else{
                 // preveri ce uID ze obstaja v bazi, ki jo ima
@@ -237,14 +238,15 @@ public class AddLocationActivity extends AppCompatActivity {
                     }
                 }
                 // zapis v bazo
-                writeNewLokacija(uID ,imeET.getText().toString(), opisET.getText().toString(), namigET.getText().toString(), Float.valueOf(latET.getText().toString()), Float.valueOf(lngET.getText().toString()));
+                writeNewLokacija(uID ,imeET.getText().toString(), naslovET.getText().toString(), opisET.getText().toString(), namigET.getText().toString(), Float.valueOf(latET.getText().toString()), Float.valueOf(lngET.getText().toString()));
             }
         }
     }
 
-    private void writeNewLokacija(String lokacijaId, String ime, String opis, String namig, float lat, float lng) {
+    private void writeNewLokacija(String lokacijaId, String ime, String naslov, String opis, String namig, float lat, float lng) {
         LocationInfo lok = new LocationInfo();
         lok.setIme(ime);
+        lok.setNaslov(naslov);
         lok.setOpis(opis);
         lok.setNamig(namig);
         lok.setLat(lat);
@@ -252,13 +254,14 @@ public class AddLocationActivity extends AppCompatActivity {
 
         // Preveri ce je na voljo povezava z internetom, ce je shrani lokacijo na internet
         if (AppNetworkStatus.getInstance(getApplicationContext()).isOnline()) {
-            /** Internet is available */
+            // Internet je na voljo
             mDatabase.child("lokacija").child(lokacijaId).setValue(lok);
 
-            Toast.makeText(getApplicationContext(), "Nova lokacija je bila upšeno poslana!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastSuccessAdded), Toast.LENGTH_LONG).show();
 
             //ponastavimo vsa vnosna polja
             imeET.setText(null);
+            naslovET.setText(null);
             opisET.setText(null);
             namigET.setText(null);
             if (!manualGps.isChecked()){
@@ -266,17 +269,49 @@ public class AddLocationActivity extends AppCompatActivity {
                 lngET.setText(null);
             }
 
-            qrCode.setText("ID LOKACIJE: "+lokacijaId+"\nIME LOKACIJE: "+ime+"\nKOORDINATE: "+lat+"  "+lng);
-            qrCode.setVisibility(View.VISIBLE);
-            downloadQr.setVisibility(View.VISIBLE);
-            downloadQr.setClickable(true);
+            // pridobi iz shared preferences moje lokacije
+            SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("myLocationList", null);
+            Type type = new TypeToken<ArrayList<LocationInfo>>() {
+            }.getType();
+            myLocations = gson.fromJson(json, type);
 
+            if (myLocations == null){
+                myLocations = new ArrayList<>();
+            }
+
+            //dodaj ta novo lokacijo
+            lok.setuID(lokacijaId);
+            myLocations.add(lok);
+
+            //shrani v shared preferences lokacijo, ki sm jo dodal
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            gson = new Gson();
+            json = gson.toJson(myLocations);
+
+            editor.remove("myLocationList");
+            editor.commit();
+
+            editor.putString("myLocationList", json);
+            editor.apply();
+
+
+            // to gre v nov intent za prikaz podrobnosti nove lokacije
+            Intent intent = new Intent(this, AddedLocationActivity.class);
+            intent.putExtra("id_lokacije", lokacijaId);
+            intent.putExtra("ime_lokacije", ime);
+            intent.putExtra("naslov_lokacije", naslov);
+            intent.putExtra("namig_lokacije", namig);
+            intent.putExtra("lat_lokacije", lat);
+            intent.putExtra("lng_lokacije", lng);
+            startActivity(intent);
 
 
             loadLocations();
         } else {
             // Internet is NOT available
-            Toast.makeText(getApplicationContext(), "Internetna povezava ni na voljo - lokacija ni bila poslana", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailAdded), Toast.LENGTH_LONG).show();
         }
 
     }
@@ -305,13 +340,6 @@ public class AddLocationActivity extends AppCompatActivity {
         return randomString;
     }
 
-    // odpre se stran za prenos QR kode
-    public void prenesiQr(View view){
-        String url = "https://chart.googleapis.com/chart?cht=qr&chl="+uID+"&chs=500x500&choe=UTF-8&chld=L%7C2";
-        Intent website = new Intent(Intent.ACTION_VIEW);
-        website.setData(Uri.parse(url));
-        startActivity(website);
-    }
 
     private void setUseGpsLocation(Boolean checked){
         if (checked){
@@ -340,7 +368,7 @@ public class AddLocationActivity extends AppCompatActivity {
         public void onLocationResult(LocationResult locationResult) {
             if (!foundLastLoc){
                 manualGps.setEnabled(true);
-                manualGps.setText("Uporabi trenutno lokacijo");
+                manualGps.setText(getResources().getString(R.string.latLngUseGPS));
                 manualGps.setChecked(true);
                 foundLastLoc = true;
             }
@@ -370,13 +398,13 @@ public class AddLocationActivity extends AppCompatActivity {
                     // permission was granted, yay! Do the
                     // contacts-related task you need to do.
                     manualGps.setEnabled(true);
-                    manualGps.setText("Uporabi trenutno lokacijo");
+                    manualGps.setText(getResources().getString(R.string.latLngUseGPS));
                     manualGps.setChecked(true);
                 } else {
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                     manualGps.setEnabled(false);
-                    manualGps.setText(manualGps.getText().toString()+" - Za vklop omogočite lokacijo");
+                    manualGps.setText(getResources().getString(R.string.latLngUseGPSnoSignal));
                     manualGps.setChecked(false);
                     setUseGpsLocation(manualGps.isChecked());
                 }
