@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +23,8 @@ public class ResultActivity extends AppCompatActivity {
     private String filenameUser;
     public static String[][] tabela;
     public static String[][] tabelaUser;
+
+    public String imeLokacije;
 
     private static final String TAG = "ResultActivity";
 
@@ -61,6 +65,7 @@ public class ResultActivity extends AppCompatActivity {
         for(int i = 0; i < tabela.length; i++){
             if(message.equals(tabela[i][0])){
                 textViewIme.setText(tabela[i][1]);
+                imeLokacije = tabela[i][1];
 
                 if (tabelaUser[i][1].equals("1")) {
                     ok = 2;
@@ -107,6 +112,11 @@ public class ResultActivity extends AppCompatActivity {
                     getApplicationContext().getResources(),
                     R.drawable.napacna2);
             myImageView.setImageBitmap(myBitmap);
+
+            Button gumbPodrobnosti = findViewById(R.id.button2);
+            gumbPodrobnosti.setEnabled(false);
+
+            gumbPodrobnosti.setTextColor(Color.parseColor("#969696"));
         }
 
     }
@@ -145,5 +155,14 @@ public class ResultActivity extends AppCompatActivity {
     public void showList(View v) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+    }
+
+    public void showDetails(View v) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("ime_lokacije", imeLokacije);
+        intent.putExtra("parentAct", "uni.fe.tnuv.qrtest5.MainActivity");
+        startActivity(intent);
+        //Intent intent = new Intent(this, MainActivity.class);
+        //startActivity(intent);
     }
 }

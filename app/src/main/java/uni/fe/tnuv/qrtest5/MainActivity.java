@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -53,6 +54,12 @@ import java.util.Collections;
 import java.util.List;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -95,11 +102,18 @@ public class MainActivity extends AppCompatActivity {
     private boolean prikazanSeznam = false;
     private boolean prikazanPrazenSeznam = false;
 
+    public static Stack<Class<?>> parents = new Stack<Class<?>>();
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        parents.push(getClass());
 
         DatotecniSistem datotecni = new DatotecniSistem();
         filename = getResources().getString(R.string.datotekaZVsebino);
@@ -615,6 +629,7 @@ public class MainActivity extends AppCompatActivity {
     public void prikaziPodrobnosti(String imeLokacije) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("ime_lokacije", imeLokacije);
+        intent.putExtra("parentAct", getClass().toString());
         startActivity(intent);
     }
 

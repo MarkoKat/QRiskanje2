@@ -11,7 +11,6 @@
     <string name="strBearing">bearing</string>
     <string name="strTilt">tilt</string>
     <string name="strPrekinjenoSkeniranje">Prekinili ste skeniranje!</string>
-    <string name="nazajNaSeznam">NAZAJ NA SEZNAM</string>
     <string name="activityAddedName">Lokacija uspešno dodana</string>
     <string name="buttonDownloadQR">Prikaži QR KODO</string>
     <string name="latLngUseGPSnoSignal">Uporabi trenutno lokacijo - Za vklop omogočite lokacijo</string>
@@ -48,4 +47,13 @@
     <string name="descList">Seznam lokacij</string>
     <string name="descScan">Skeniraj</string>
     <string name="descMap">Zemljevid</string>
+    <string name="nazajNaSeznam">NAZAJ</string>
+    <string name="gumbPodrobnosti">PODROBNOSTI</string>
+    <string name="strZagon">zagon</string>
+    <string name="strZagon2">zagon2</string>
+    <string name="strOpis">Opis:</string>
+    <string name="strNamig">Namig:</string>
+    <string name="strPodrobnosti">Podrobnosti</string>
+    <string name="strRezultat">Rezultat skeniranja</string>
+    <string name="napaka">Napaka!</string>
 </resources>

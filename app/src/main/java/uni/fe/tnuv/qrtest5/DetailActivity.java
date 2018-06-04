@@ -10,10 +10,12 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -26,6 +28,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Stack;
 
 import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
@@ -40,10 +43,18 @@ public class DetailActivity extends AppCompatActivity {
 
     public int trenutnaKoda;
 
+    private static final String TAG = "DetailActivity";
+
+    public static Stack<Class<?>> parents = new Stack<Class<?>>();
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
@@ -72,34 +83,45 @@ public class DetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String message = intent.getStringExtra("ime_lokacije");
 
-        TextView textView = findViewById(R.id.textView_ime_lokacije);
+        TextView textView_ime = findViewById(R.id.textView_ime_lokacije);
+        TextView textView_opis = findViewById(R.id.textView_opis);
+        TextView textView_namig = findViewById(R.id.textView_namig);
+        TextView textView_kraj = findViewById(R.id.textView_kraj);
 
         // Obojestranska poravnava - samo na Oreo
-        TextView textView2 = findViewById(R.id.textView_namig);
         if (Build.VERSION.SDK_INT >= 26) {
-            textView2.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
+            textView_opis.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
+            textView_namig.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
         }
 
         TextView textViewId = findViewById(R.id.textView_id);
         int ok = 0;
         for(int i = 0; i < tabela.length; i++){
             if(message.equals(tabela[i][1])){
-                textView2.setText(tabela[i][2]);
+                textView_opis.setText(tabela[i][2]);
+                // Se namig in kraj
+                /*
+                textView_namig.setText(tabela[i][5]);
+                textView_kraj.setText(tabela[i][6]);
+                 */
+
                 textViewId.setText("ID: " + tabela[i][0]);
                 ok = 1;
                 trenutnaKoda = i;
                 if(tabelaUser[i][1].equals("1")) {
                     int unicode = 0x2714; // Kljukica pred imenom lokacije
-                    textView.setText(getEmojiByUnicode(unicode) + " " +  message);
-                    textView.setTextColor(Color.parseColor("#00a813"));
+                    textView_ime.setText(getEmojiByUnicode(unicode) + " " +  message);
+                    textView_ime.setTextColor(Color.parseColor("#00a813"));
                 }
                 else {
-                    textView.setText(message);
+                    textView_ime.setText(message);
                 }
             }
         }
         if(ok == 0) {
-            textView2.setText(getResources().getString(R.string.napakaNamig));
+            textView_opis.setText(getResources().getString(R.string.napakaNamig));
+            textView_namig.setText(getResources().getString(R.string.napaka));
+            textView_kraj.setText(getResources().getString(R.string.napaka));
         }
 
         // Pridobivanje lokacije za izracun razdalje
@@ -184,5 +206,33 @@ public class DetailActivity extends AppCompatActivity {
 
     public String getEmojiByUnicode(int unicode){
         return new String(Character.toChars(unicode));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+
+            case android.R.id.home:
+                Intent intent = getIntent();
+                String parent = intent.getStringExtra("parentAct");
+                parent =  parent.substring(6,parent.length());
+                Class prej = MainActivity.class;
+
+                try {
+                    prej = Class.forName(parent);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                Intent parentActivityIntent = new Intent(this, prej);
+                parentActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(parentActivityIntent);
+                finish();
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
