@@ -3,6 +3,7 @@ package uni.fe.tnuv.qrtest5;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +26,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -41,6 +45,13 @@ public class DetailActivity extends AppCompatActivity {
     private String filename;
     private String filenameUser;
 
+    private String LONGITUDE;
+    private String LATITUDE;
+    private String ZOOM;
+    private String BEARING;
+    private String TILT;
+    private String POLOZAJ;
+
     public int trenutnaKoda;
 
     private static final String TAG = "DetailActivity";
@@ -58,6 +69,13 @@ public class DetailActivity extends AppCompatActivity {
 
         filename = getResources().getString(R.string.datotekaZVsebino);
         filenameUser = getResources().getString(R.string.datotekaZVsebinoUser);
+
+        LONGITUDE = getResources().getString(R.string.strLongitude);
+        LATITUDE = getResources().getString(R.string.strLatitude);
+        ZOOM = getResources().getString(R.string.strZoom);
+        BEARING = getResources().getString(R.string.strBearing);
+        TILT = getResources().getString(R.string.strTilt);
+        POLOZAJ = getResources().getString(R.string.strPolozaj);
 
         //Branje lokacij iz datotecnega sistema
         String tabela2 = beriIzDatoteke(filename);
@@ -82,6 +100,7 @@ public class DetailActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String message = intent.getStringExtra("ime_lokacije");
+        boolean naZemljevidu = intent.getBooleanExtra("naZemljevidu", false);
 
         TextView textView_ime = findViewById(R.id.textView_ime_lokacije);
         TextView textView_opis = findViewById(R.id.textView_opis);
@@ -184,6 +203,12 @@ public class DetailActivity extends AppCompatActivity {
                 textViewOddaljenost.setText(getResources().getString(R.string.obvestiloNiLokacijskihStoritevDetail));
             }
         }
+
+        // Prikazi gumb za prikaz na zemljevidu ce pride iz seznama
+        Button zem = findViewById(R.id.gumbNaZemljevid);
+        if(!naZemljevidu) {
+            zem.setVisibility(View.INVISIBLE);
+        }
     }
 
     private String beriIzDatoteke(String filenameLoc){
@@ -236,5 +261,27 @@ public class DetailActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void prikaziZemljevid(View v) {
+        try{
+            SharedPreferences sharedPrefs = getSharedPreferences(POLOZAJ, 0);
+
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+
+            editor.putFloat(LATITUDE, Float.parseFloat(tabela[trenutnaKoda][3]));
+            editor.putFloat(LONGITUDE, Float.parseFloat(tabela[trenutnaKoda][4]));
+            editor.putFloat(ZOOM, 17);
+            editor.putFloat(TILT, 0);
+            editor.putFloat(BEARING, 0);
+            editor.apply();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("izPodrobnosti", true);
+        startActivity(intent);
     }
 }

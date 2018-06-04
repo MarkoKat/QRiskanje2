@@ -57,11 +57,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private boolean mapReady = false;
 
-    private String LONGITUDE = "longitude";
-    private String LATITUDE = "latitude";
-    private String ZOOM = "zoom";
-    private String BEARING = "bearing";
-    private String TILT = "tilt";
+    private String LONGITUDE;
+    private String LATITUDE;
+    private String ZOOM;
+    private String BEARING;
+    private String TILT;
 
     private ImageButton listButton;
     private ImageButton scanButton;
@@ -69,6 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String ZAGON;
     private String ZAGON2;
+    private String POLOZAJ;
 
     public static Stack<Class<?>> parents = new Stack<Class<?>>();
 
@@ -94,6 +95,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         ZAGON = getResources().getString(R.string.strZagon);
         ZAGON2 = getResources().getString(R.string.strZagon2);
+        POLOZAJ = getResources().getString(R.string.strPolozaj);
 
         listButton = findViewById(R.id.button_list);
         scanButton = findViewById(R.id.scan_barcode);
@@ -150,19 +152,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         public void onSuccess(Location location) {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
-                                SharedPreferences sharedPrefs = getSharedPreferences(ZAGON, 0);
-                                int zagon = sharedPrefs.getInt(ZAGON2, 1);
+                                if (AppNetworkStatus.getInstance(getApplicationContext()).isOnline()) {
+                                    SharedPreferences sharedPrefs = getSharedPreferences(ZAGON, 0);
+                                    int zagon = sharedPrefs.getInt(ZAGON2, 1);
+                                    Intent intent = getIntent();
+                                    boolean izPodrobnosti = intent.getBooleanExtra("izPodrobnosti", false);
 
-                                if(zagon == 1) {
-                                    // Ko je aplikacija ponovno zagnana
-                                    LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12);
-                                    mMap.animateCamera(cameraUpdate);
+                                    if (zagon == 1 && !izPodrobnosti) {
+                                        // Ko je aplikacija ponovno zagnana
+                                        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+                                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12);
+                                        mMap.animateCamera(cameraUpdate);
 
-                                    SharedPreferences.Editor editor = sharedPrefs.edit();
+                                        SharedPreferences.Editor editor = sharedPrefs.edit();
 
-                                    editor.putInt(ZAGON2, 0);
-                                    editor.apply();
+                                        editor.putInt(ZAGON2, 0);
+                                        editor.apply();
+                                    }
+                                    else if(izPodrobnosti) {
+                                        SharedPreferences.Editor editor = sharedPrefs.edit();
+                                        editor.putInt(ZAGON2, 0);
+                                        editor.apply();
+                                    }
                                 }
                             }
                         }
@@ -189,12 +200,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapReady = true; // Za preprecevanje napake ob prvem zagonu
 
         // Pridobivanje podatkov o zadnji poziciji zemljevida
-        SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(POLOZAJ, 0);
         SharedPreferences sharedPrefs2 = getSharedPreferences(ZAGON, 0);
 
         int zagon = sharedPrefs2.getInt(ZAGON2, 1);
+        Intent intent = getIntent();
+        boolean izPodrobnosti = intent.getBooleanExtra("izPodrobnosti", false);
 
-        if(zagon == 0) {
+        if(zagon == 0 || izPodrobnosti) {
             double latitude = sharedPrefs.getFloat(LATITUDE, 0);
             double longitude = sharedPrefs.getFloat(LONGITUDE, 0);
             LatLng target = new LatLng(latitude, longitude);
@@ -279,6 +292,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("ime_lokacije", imeLokacije);
         intent.putExtra("parentAct", getClass().toString());
+        intent.putExtra("naZemljevidu", false);
         startActivity(intent);
     }
 
@@ -352,7 +366,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Shranjevanje trenutne pozicije zemljevida
         if(mapReady) {
             try{
-                SharedPreferences sharedPrefs = getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences sharedPrefs = getSharedPreferences(POLOZAJ, 0);
 
                 SharedPreferences.Editor editor = sharedPrefs.edit();
                 CameraPosition position = mMap.getCameraPosition();
