@@ -12,6 +12,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/id_edit"
             android:textColor="@color/matteBlackText"
+            android:padding="10dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
             android:textSize="16sp"/>
 
         <EditText
@@ -93,10 +96,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/buttonDeleteLocation"
-            android:onClick="delete"
+            android:onClick="deleteLoc"
             android:layout_gravity="center"
             android:textColor="@android:color/white"
             android:backgroundTint="@color/deleteRed"
+            android:drawableStart="@drawable/ic_delete_white_24dp"
             />
     </LinearLayout>
 </ScrollView>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 
 public class EditLocationsActivity extends AppCompatActivity {
 
+    private ArrayList<LocationInfo> allLocations;
     private ArrayList<LocationInfo> myLocations;
 
     @Override
@@ -36,6 +38,25 @@ public class EditLocationsActivity extends AppCompatActivity {
         }.getType();
         myLocations = gson.fromJson(json, type);
 
+
+        gson = new Gson();
+        json = sharedPreferences.getString("locationList", null);
+        type = new TypeToken<ArrayList<LocationInfo>>() {}.getType();
+        allLocations = gson.fromJson(json, type);
+
+        for (int i = 0; i<allLocations.size(); i++){
+            for (int j = 0; j<myLocations.size(); j++){
+                if(allLocations.get(i).getuID().equals(myLocations.get(j).getuID())){
+                    myLocations.get(j).setIme(allLocations.get(i).getIme());
+                    myLocations.get(j).setNaslov(allLocations.get(i).getNaslov());
+                    myLocations.get(j).setOpis(allLocations.get(i).getOpis());
+                    myLocations.get(j).setNamig(allLocations.get(i).getNamig());
+                    myLocations.get(j).setLat(allLocations.get(i).getLat());
+                    myLocations.get(j).setLng(allLocations.get(i).getLng());
+                }
+            }
+        }
+
         if (myLocations != null && !myLocations.isEmpty()) {
             ListView mListView = findViewById(R.id.my_list_view);
             LocationListAdapter adapter = new LocationListAdapter(this, R.layout.adapter_location_view, myLocations);
@@ -49,15 +70,12 @@ public class EditLocationsActivity extends AppCompatActivity {
                     // zazenem activity za urejanje
                     Intent intent = new Intent(getApplicationContext(), EditSelectedLocationActivity.class);
                     intent.putExtra("id_lokacije", selectedLocation.getuID());
-                    intent.putExtra("ime_lokacije", selectedLocation.getIme());
-                    intent.putExtra("naslov_lokacije", selectedLocation.getNaslov());
-                    intent.putExtra("opis_lokacije", selectedLocation.getOpis());
-                    intent.putExtra("namig_lokacije", selectedLocation.getNamig());
-                    intent.putExtra("lat_lokacije", selectedLocation.getLat());
-                    intent.putExtra("lng_lokacije", selectedLocation.getLng());
                     startActivity(intent);
                 }
             });
+        }else{
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -69,5 +87,23 @@ public class EditLocationsActivity extends AppCompatActivity {
             this.finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event)  {
+        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
+                && keyCode == KeyEvent.KEYCODE_BACK
+                && event.getRepeatCount() == 0) {
+            onBackPressed();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
     }
 }

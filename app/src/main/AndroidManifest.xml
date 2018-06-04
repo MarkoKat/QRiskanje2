@@ -45,7 +45,8 @@
             android:name=".AddLocationActivity"
             android:label="@string/add_activity_name" />
         <activity android:name=".AddedLocationActivity" />
-        <activity android:name=".EditLocationsActivity" />
+        <activity android:name=".EditLocationsActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity android:name=".EditSelectedLocationActivity" />
         <activity android:name=".SplashActivity"
             android:theme="@style/AppTheme.Launcher">
