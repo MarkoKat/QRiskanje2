@@ -16,13 +16,17 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        SharedPreferences sharedPrefs = getSharedPreferences("zagon", 0);
+        String ZAGON = getResources().getString(R.string.strZagon);
+        String ZAGON2 = getResources().getString(R.string.strZagon2);
+
+        // Oznaci da je bila aplikacija ponovno zagnana - zemljevid se postavi na trenutno lokacijo
+        SharedPreferences sharedPrefs = getSharedPreferences(ZAGON, 0);
         SharedPreferences.Editor editor = sharedPrefs.edit();
 
-        editor.putInt("zagon2", 1);
+        editor.putInt(ZAGON2, 1);
         editor.apply();
-        Log.v(TAG, "MarkoSplash1 - " + sharedPrefs.getInt("zagon2", 0));
 
+        // Takoj po zagonu preklopi na MainActivity - seznam
         Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
         startActivity(mainIntent);
         finish();

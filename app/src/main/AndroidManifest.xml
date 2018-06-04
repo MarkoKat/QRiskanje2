@@ -29,7 +29,8 @@
             android:value="barcode" />
 
         <activity android:name=".ScanBarcodeActivity" />
-        <activity android:name=".ResultActivity" />
+        <activity android:name=".ResultActivity"
+            android:label="@string/strRezultat"/>
         <activity android:name=".MapsActivity" />
 
         <meta-data
@@ -38,6 +39,7 @@
 
         <activity
             android:name=".DetailActivity"
+            android:label="@string/strPodrobnosti"
             android:parentActivityName=".MapsActivity" />
         <activity
             android:name=".AddLocationActivity"

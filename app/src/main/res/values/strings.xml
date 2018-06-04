@@ -13,4 +13,11 @@
     <string name="strPrekinjenoSkeniranje">Prekinili ste skeniranje!</string>
     <string name="nazajNaSeznam">NAZAJ</string>
     <string name="gumbPodrobnosti">PODROBNOSTI</string>
+    <string name="strZagon">zagon</string>
+    <string name="strZagon2">zagon2</string>
+    <string name="strOpis">Opis:</string>
+    <string name="strNamig">Namig:</string>
+    <string name="strPodrobnosti">Podrobnosti</string>
+    <string name="strRezultat">Rezultat skeniranja</string>
+    <string name="napaka">Napaka!</string>
 </resources>
