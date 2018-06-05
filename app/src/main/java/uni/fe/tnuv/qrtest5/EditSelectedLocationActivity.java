@@ -3,6 +3,7 @@ package uni.fe.tnuv.qrtest5;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -45,6 +46,13 @@ public class EditSelectedLocationActivity extends AppCompatActivity {
     private EditText latET;
     private EditText lngET;
 
+    private TextView imeTv;
+    private TextView naslovTv;
+    private TextView opisTv;
+    private TextView namigTv;
+    private TextView latTv;
+    private TextView lngTv;
+
     private int indexLoc;
 
     private DatabaseReference mDatabase;
@@ -81,6 +89,8 @@ public class EditSelectedLocationActivity extends AppCompatActivity {
             }
         }
 
+        setTitle("Urejanje lokacije: "+ime);
+
         //pridobi EditText it layout-a
         idTV = findViewById(R.id.id_edit);
         imeET = findViewById(R.id.ime_edit);
@@ -98,7 +108,61 @@ public class EditSelectedLocationActivity extends AppCompatActivity {
         latET.setText(String.valueOf(lat));
         lngET.setText(String.valueOf(lng));
 
-        setTitle("Urejanje lokacije: "+ime);
+        imeTv = findViewById(R.id.label_ime_e);
+        naslovTv = findViewById(R.id.label_naslov_e);
+        opisTv = findViewById(R.id.label_opis_e);
+        namigTv = findViewById(R.id.label_namig_e);
+        latTv = findViewById(R.id.label_lat_e);
+        lngTv = findViewById(R.id.label_lng_e);
+
+        imeET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    imeTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        naslovET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    naslovTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        opisET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    opisTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        namigET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    namigTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        latET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    latTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        lngET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    lngTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
 
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -123,54 +187,83 @@ public class EditSelectedLocationActivity extends AppCompatActivity {
     public void posodobi(View view){
         if (imeET.getText().toString().matches("") || naslovET.getText().toString().matches("") || opisET.getText().toString().matches("") || namigET.getText().toString().matches("")  || latET.getText().toString().matches("") || lngET.getText().toString().matches("") ){
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastEnterAllData), Toast.LENGTH_SHORT).show();
+            if (imeET.getText().toString().matches("")){
+                imeTv.setTextColor(Color.RED);
+            }
+            if(naslovET.getText().toString().matches("")){
+                naslovTv.setTextColor(Color.RED);
+            }
+            if(opisET.getText().toString().matches("")){
+                opisTv.setTextColor(Color.RED);
+            }
+            if(namigET.getText().toString().matches("")){
+                namigTv.setTextColor(Color.RED);
+            }
+            if(latET.getText().toString().matches("")){
+                latTv.setTextColor(Color.RED);
+            }
+            if(lngET.getText().toString().matches("")){
+                lngTv.setTextColor(Color.RED);
+            }
         }
         else {
-            if (AppNetworkStatus.getInstance(getApplicationContext()).isOnline()) {
-                try {
-                    ime = imeET.getText().toString();
-                    naslov = naslovET.getText().toString();
-                    opis = opisET.getText().toString();
-                    namig = namigET.getText().toString();
-                    lat = Float.parseFloat(latET.getText().toString());
-                    lng = Float.parseFloat(lngET.getText().toString());
-
-
-                    mDatabase.child("lokacija").child(lokacijaId).child("ime").setValue(ime);
-                    mDatabase.child("lokacija").child(lokacijaId).child("naslov").setValue(naslov);
-                    mDatabase.child("lokacija").child(lokacijaId).child("opis").setValue(opis);
-                    mDatabase.child("lokacija").child(lokacijaId).child("namig").setValue(namig);
-                    mDatabase.child("lokacija").child(lokacijaId).child("lat").setValue(lat);
-                    mDatabase.child("lokacija").child(lokacijaId).child("lng").setValue(lng);
-
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastSuccessUpdate), Toast.LENGTH_LONG).show();
-
-                    allLocations.get(indexLoc).setIme(ime);
-                    allLocations.get(indexLoc).setNaslov(naslov);
-                    allLocations.get(indexLoc).setOpis(opis);
-                    allLocations.get(indexLoc).setNamig(namig);
-                    allLocations.get(indexLoc).setLat(lat);
-                    allLocations.get(indexLoc).setLng(lng);
-
-
-                    SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    Gson gson = new Gson();
-                    String json = gson.toJson(allLocations);
-
-                    editor.remove("locationList");
-                    editor.commit();
-
-                    editor.putString("locationList", json);
-                    editor.apply();
-
-                    Intent intentEdit = new Intent(this, EditLocationsActivity.class);
-                    startActivity(intentEdit);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailUpdate), Toast.LENGTH_LONG).show();
+            if (Math.abs(Double.valueOf(latET.getText().toString())) > 90 || Math.abs(Double.valueOf(lngET.getText().toString())) > 180) {
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastEnterCorrectCoordinates), Toast.LENGTH_SHORT).show();
+                if (Math.abs(Double.valueOf(latET.getText().toString())) > 90){
+                    latTv.setTextColor(Color.RED);
                 }
-            } else {
-                Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailUpdateNoConnection), Toast.LENGTH_LONG).show();
+                if (Math.abs(Double.valueOf(lngET.getText().toString())) > 180){
+                    lngTv.setTextColor(Color.RED);
+                }
+            }
+            else {
+                if (AppNetworkStatus.getInstance(getApplicationContext()).isOnline()) {
+                    try {
+                        ime = imeET.getText().toString();
+                        naslov = naslovET.getText().toString();
+                        opis = opisET.getText().toString();
+                        namig = namigET.getText().toString();
+                        lat = Float.parseFloat(latET.getText().toString());
+                        lng = Float.parseFloat(lngET.getText().toString());
+
+
+                        mDatabase.child("lokacija").child(lokacijaId).child("ime").setValue(ime);
+                        mDatabase.child("lokacija").child(lokacijaId).child("naslov").setValue(naslov);
+                        mDatabase.child("lokacija").child(lokacijaId).child("opis").setValue(opis);
+                        mDatabase.child("lokacija").child(lokacijaId).child("namig").setValue(namig);
+                        mDatabase.child("lokacija").child(lokacijaId).child("lat").setValue(lat);
+                        mDatabase.child("lokacija").child(lokacijaId).child("lng").setValue(lng);
+
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastSuccessUpdate), Toast.LENGTH_LONG).show();
+
+                        allLocations.get(indexLoc).setIme(ime);
+                        allLocations.get(indexLoc).setNaslov(naslov);
+                        allLocations.get(indexLoc).setOpis(opis);
+                        allLocations.get(indexLoc).setNamig(namig);
+                        allLocations.get(indexLoc).setLat(lat);
+                        allLocations.get(indexLoc).setLng(lng);
+
+
+                        SharedPreferences sharedPreferences = getSharedPreferences("sharedPreferences", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        Gson gson = new Gson();
+                        String json = gson.toJson(allLocations);
+
+                        editor.remove("locationList");
+                        editor.commit();
+
+                        editor.putString("locationList", json);
+                        editor.apply();
+
+                        Intent intentEdit = new Intent(this, EditLocationsActivity.class);
+                        startActivity(intentEdit);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailUpdate), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastFailUpdateNoConnection), Toast.LENGTH_LONG).show();
+                }
             }
         }
     }

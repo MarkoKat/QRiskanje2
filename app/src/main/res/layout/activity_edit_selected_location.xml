@@ -16,7 +16,18 @@
             android:layout_gravity="center"
             android:textAlignment="center"
             android:textSize="16sp"/>
-
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/label_ime_e"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/labelIme"
+            android:textSize="15sp"
+            android:textColor="@color/matteBlackText"
+            android:labelFor="@+id/ime_edit"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,6 +36,19 @@
             android:inputType="text"
             android:maxLength="50"
             />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/label_naslov_e"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/labelNaslov"
+            android:textSize="15sp"
+            android:textColor="@color/matteBlackText"
+            android:labelFor="@+id/naslov_edit"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,7 +57,19 @@
             android:inputType="text"
             android:maxLength="50"
             />
-
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/label_opis_e"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/labelOpis"
+            android:textSize="15sp"
+            android:textColor="@color/matteBlackText"
+            android:labelFor="@+id/opis_edit"/>
         <EditText
             android:id="@+id/opis_edit"
             android:layout_width="match_parent"
@@ -41,9 +77,22 @@
             android:hint="@string/editTextOpis"
             android:inputType="textMultiLine"
             android:singleLine="false"
-            android:maxLines="5"
+            android:maxLines="8"
             android:gravity="top"
             android:maxLength="1000"/>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/label_namig_e"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/labelNamig"
+            android:textSize="15sp"
+            android:textColor="@color/matteBlackText"
+            android:labelFor="@+id/namig_edit"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,6 +101,19 @@
             android:maxLength="100"
             android:inputType="text"
             />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/label_lat_e"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/labelLat"
+            android:textSize="15sp"
+            android:textColor="@color/matteBlackText"
+            android:labelFor="@+id/lat_edit"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -60,6 +122,19 @@
             android:inputType="numberDecimal|numberSigned"
             android:maxLength="100"
             />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/label_lng_e"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/labelLng"
+            android:textSize="15sp"
+            android:textColor="@color/matteBlackText"
+            android:labelFor="@+id/lng_edit" />
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,6 +143,7 @@
             android:inputType="numberDecimal|numberSigned"
             android:maxLength="100"
             />
+    </LinearLayout>
 
         <Button
             android:layout_width="wrap_content"

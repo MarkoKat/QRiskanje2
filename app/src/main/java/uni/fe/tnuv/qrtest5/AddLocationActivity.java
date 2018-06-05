@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -71,6 +72,13 @@ public class AddLocationActivity extends AppCompatActivity {
     private EditText lngET;
     private CheckBox manualGps;
 
+    private TextView imeTv;
+    private TextView naslovTv;
+    private TextView opisTv;
+    private TextView namigTv;
+    private TextView latTv;
+    private TextView lngTv;
+
 
     private String uID;
     private Double currLat;
@@ -104,6 +112,63 @@ public class AddLocationActivity extends AppCompatActivity {
         latET = findViewById(R.id.lat);
         lngET = findViewById(R.id.lng);
         manualGps = findViewById(R.id.use_gps);
+
+        imeTv = findViewById(R.id.label_ime);
+        naslovTv = findViewById(R.id.label_naslov);
+        opisTv = findViewById(R.id.label_opis);
+        namigTv = findViewById(R.id.label_namig);
+        latTv = findViewById(R.id.label_lat);
+        lngTv = findViewById(R.id.label_lng);
+
+        imeET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    imeTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        naslovET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    naslovTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        opisET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    opisTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        namigET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    namigTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        latET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    latTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+        lngET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (hasFocus) {
+                    lngTv.setTextColor(getResources().getColor(R.color.matteBlackText));
+                }
+            }
+        });
+
 
         // preberi vse lokacije shranjene v sharedPreferences
         loadLocations();
@@ -218,10 +283,34 @@ public class AddLocationActivity extends AppCompatActivity {
         // preveri ce so izpolnjeni vsi podatki
         if (imeET.getText().toString().matches("") || naslovET.getText().toString().matches("") || opisET.getText().toString().matches("") || namigET.getText().toString().matches("")  || latET.getText().toString().matches("") || lngET.getText().toString().matches("") ){
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastEnterAllData), Toast.LENGTH_SHORT).show();
+            if (imeET.getText().toString().matches("")){
+                imeTv.setTextColor(Color.RED);
+            }
+            if(naslovET.getText().toString().matches("")){
+                naslovTv.setTextColor(Color.RED);
+            }
+            if(opisET.getText().toString().matches("")){
+                opisTv.setTextColor(Color.RED);
+            }
+            if(namigET.getText().toString().matches("")){
+                namigTv.setTextColor(Color.RED);
+            }
+            if(latET.getText().toString().matches("")){
+                latTv.setTextColor(Color.RED);
+            }
+            if(lngET.getText().toString().matches("")){
+                lngTv.setTextColor(Color.RED);
+            }
         }
         else{
             if (Math.abs(Double.valueOf(latET.getText().toString())) > 90 || Math.abs(Double.valueOf(lngET.getText().toString())) > 180) {
                 Toast.makeText(getApplicationContext(), getResources().getString(R.string.toastEnterCorrectCoordinates), Toast.LENGTH_SHORT).show();
+                if (Math.abs(Double.valueOf(latET.getText().toString())) > 90){
+                    latTv.setTextColor(Color.RED);
+                }
+                if (Math.abs(Double.valueOf(lngET.getText().toString())) > 180){
+                    lngTv.setTextColor(Color.RED);
+                }
             }
             else{
                 // preveri ce uID ze obstaja v bazi, ki jo ima

@@ -23,8 +23,8 @@
     <string name="editTextNaslov">Naslov</string>
     <string name="editTextOpis">Opis</string>
     <string name="editTextNamig">Namig</string>
-    <string name="editTextLat">Zemljepisna širina (od -90° do +90°)</string>
-    <string name="editTextLng">Zemljepisna dolžina (od -180° do +180°)</string>
+    <string name="editTextLat">od -90° do +90°</string>
+    <string name="editTextLng">od -180° do +180°</string>
     <string name="buttonAddLocation">Dodaj lokacijo&#160;&#160;&#160;</string>
     <string name="toastDatabaseError">Napaka pri povezavi z bazo!</string>
     <string name="infoLoading">Nalagam lokacije&#8230;</string>
@@ -65,4 +65,10 @@
     <string name="alertDeleteConfirm">Izbriši</string>
     <string name="alertDeleteCancel">Prekliči</string>
     <string name="prikaziZemljevid">PRIKAŽI NA ZEMLJEVIDU</string>
+    <string name="labelIme">Ime*:</string>
+    <string name="labelNaslov">Naslov*:</string>
+    <string name="labelOpis">Opis*:</string>
+    <string name="labelNamig">Namig*:</string>
+    <string name="labelLat">Zemljepisna širina*:</string>
+    <string name="labelLng">Zemljepisna dolžina*:</string>
 </resources>
