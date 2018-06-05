@@ -65,6 +65,7 @@
     <string name="alertDeleteConfirm">Izbriši</string>
     <string name="alertDeleteCancel">Prekliči</string>
     <string name="prikaziZemljevid">PRIKAŽI NA ZEMLJEVIDU</string>
+    <string name="strPolozaj">polozajZemljevida</string>
     <string name="labelIme">Ime*:</string>
     <string name="labelNaslov">Naslov*:</string>
     <string name="labelOpis">Opis*:</string>

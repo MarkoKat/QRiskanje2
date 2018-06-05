@@ -537,6 +537,7 @@ public class MainActivity extends AppCompatActivity {
     // Prehod na aktivnost z zemljevidom
     public void showMaps(View v) {
         Intent intent = new Intent(this, MapsActivity.class);
+        intent.putExtra("izPodrobnosti", false);
         startActivity(intent);
         mapButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         listButton.setBackgroundColor(Color.GRAY);
@@ -638,6 +639,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("ime_lokacije", imeLokacije);
         intent.putExtra("parentAct", getClass().toString());
+        intent.putExtra("naZemljevidu", true);
         startActivity(intent);
     }
 
