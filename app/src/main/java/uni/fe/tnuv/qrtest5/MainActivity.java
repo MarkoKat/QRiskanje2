@@ -3,6 +3,7 @@ package uni.fe.tnuv.qrtest5;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -13,6 +14,7 @@ import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -184,6 +186,25 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Comments", "First time");
 
             // first time task
+            // pozdrav in kratek opis aplikacije
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setCancelable(true);
+            builder.setTitle(getResources().getString(R.string.alertWelcomeTitle));
+            builder.setMessage(getResources().getString(R.string.alertWelcomeMessage));
+            builder.setPositiveButton(getResources().getString(R.string.alertWelcomeConfirm),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            try {
+
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.errorFirstTime), Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+            AlertDialog dialog = builder.create();
+            dialog.show();
             // Prva nastavitev tabele z najdenimi lokacijami
             StringBuilder sbUser = new StringBuilder();
             for (int i = 0; i < allLocations.size(); i++) {

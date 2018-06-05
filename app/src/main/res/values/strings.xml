@@ -71,4 +71,8 @@
     <string name="labelNamig">Namig*:</string>
     <string name="labelLat">Zemljepisna širina*:</string>
     <string name="labelLng">Zemljepisna dolžina*:</string>
+    <string name="errorFirstTime">Napaka prvega zagona</string>
+    <string name="alertWelcomeConfirm">Vredu</string>
+    <string name="alertWelcomeTitle">Pozdravljeni!</string>
+    <string name="alertWelcomeMessage">V realnem svetu obiščite lokacije, ki jih vidite na seznamu in zemljevidu. Na lokaciji s pomočjo namiga poiščite QR kode in jih skenirajte. \nS klikom na gumb + lahko dodate svoje lokacije, ki jih lahko potem tudi urejate. </string>
 </resources>
