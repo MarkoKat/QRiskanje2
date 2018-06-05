@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Ugotavljanje prvega zagona aplikacije
-        final String PREFS_NAME = "PrviZagonFile";
+        final String PREFS_NAME = getResources().getString(R.string.strPrviZagonFile);
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
 
@@ -524,7 +524,7 @@ public class MainActivity extends AppCompatActivity {
                 scanButton.setBackgroundColor(Color.GRAY);
 
                 Intent intent = new Intent(this, ResultActivity.class);
-                intent.putExtra("barcode", result.getContents());
+                intent.putExtra(getResources().getString(R.string.intentBarcode), result.getContents());
                 startActivity(intent);
             }
         }
@@ -537,7 +537,7 @@ public class MainActivity extends AppCompatActivity {
     // Prehod na aktivnost z zemljevidom
     public void showMaps(View v) {
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra("izPodrobnosti", false);
+        intent.putExtra(getResources().getString(R.string.strIzPodrobnosti), false);
         startActivity(intent);
         mapButton.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
         listButton.setBackgroundColor(Color.GRAY);
@@ -637,9 +637,9 @@ public class MainActivity extends AppCompatActivity {
     // ob kliku na lokacijo v seznamu se odpre aktivnost s podrobnostjo
     public void prikaziPodrobnosti(String imeLokacije) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("ime_lokacije", imeLokacije);
-        intent.putExtra("parentAct", getClass().toString());
-        intent.putExtra("naZemljevidu", true);
+        intent.putExtra(getResources().getString(R.string.intentImeLokacije), imeLokacije);
+        intent.putExtra(getResources().getString(R.string.intentParentAct), getClass().toString());
+        intent.putExtra(getResources().getString(R.string.intentNaZemljevidu), true);
         startActivity(intent);
     }
 

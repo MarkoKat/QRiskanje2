@@ -156,7 +156,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     SharedPreferences sharedPrefs = getSharedPreferences(ZAGON, 0);
                                     int zagon = sharedPrefs.getInt(ZAGON2, 1);
                                     Intent intent = getIntent();
-                                    boolean izPodrobnosti = intent.getBooleanExtra("izPodrobnosti", false);
+                                    boolean izPodrobnosti = intent.getBooleanExtra(getResources().getString(R.string.strIzPodrobnosti), false);
 
                                     if (zagon == 1 && !izPodrobnosti) {
                                         // Ko je aplikacija ponovno zagnana
@@ -188,7 +188,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         else {
             TextView mapInfo = findViewById(R.id.mapsInfo);
-            mapInfo.setText("Za prenos lokacij je potrebna internetna povezava!");
+            mapInfo.setText(getResources().getString(R.string.strNiInternetaMaps));
             mapInfo.bringToFront();
         }
     }
@@ -205,7 +205,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         int zagon = sharedPrefs2.getInt(ZAGON2, 1);
         Intent intent = getIntent();
-        boolean izPodrobnosti = intent.getBooleanExtra("izPodrobnosti", false);
+        boolean izPodrobnosti = intent.getBooleanExtra(getResources().getString(R.string.strIzPodrobnosti), false);
 
         if(zagon == 0 || izPodrobnosti) {
             double latitude = sharedPrefs.getFloat(LATITUDE, 0);
@@ -227,6 +227,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Permission is not granted
+            SharedPreferences.Editor editor = sharedPrefs2.edit();
+            editor.putInt(ZAGON2, 0);
+            editor.apply();
         }
         else{
             mMap.setMyLocationEnabled(true);
@@ -269,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             else{
                 Intent intent = new Intent(this, ResultActivity.class);
-                intent.putExtra("barcode", result.getContents());
+                intent.putExtra(getResources().getString(R.string.intentBarcode), result.getContents());
                 startActivity(intent);
             }
         }
@@ -290,9 +293,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Prikaz podrobnosti lokacije ob kliku na ime nad markerjem
     public void prikaziPodrobnosti(String imeLokacije) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("ime_lokacije", imeLokacije);
-        intent.putExtra("parentAct", getClass().toString());
-        intent.putExtra("naZemljevidu", false);
+        intent.putExtra(getResources().getString(R.string.intentImeLokacije), imeLokacije);
+        intent.putExtra(getResources().getString(R.string.intentParentAct), getClass().toString());
+        intent.putExtra(getResources().getString(R.string.intentNaZemljevidu), false);
         startActivity(intent);
     }
 
