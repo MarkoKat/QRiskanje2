@@ -85,7 +85,7 @@ public class EditSelectedLocationActivity extends AppCompatActivity {
                 opis = allLocations.get(i).getOpis();
                 namig = allLocations.get(i).getNamig();
                 lat = allLocations.get(i).getLat();
-                lat = allLocations.get(i).getLng();
+                lng = allLocations.get(i).getLng();
             }
         }
 

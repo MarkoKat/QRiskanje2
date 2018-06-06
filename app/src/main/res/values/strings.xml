@@ -28,7 +28,7 @@
     <string name="buttonAddLocation">Dodaj lokacijo&#160;&#160;&#160;</string>
     <string name="toastDatabaseError">Napaka pri povezavi z bazo!</string>
     <string name="infoLoading">Nalagam lokacije&#8230;</string>
-    <string name="infoNoConnection">Za prenos lokacij je potrebna internetna povezava!\"</string>
+    <string name="infoNoConnection">Za prenos lokacij je potrebna internetna povezava!</string>
     <string name="infoFoundAll">Čestitamo, odkrili ste že vse lokacije!</string>
     <string name="infoFoundNone">Odkril nisi še nobene lokacije. \nOdpravi se na pot in skeniraj QR kode!</string>
     <string name="infoNoneFound">Ne najdem lokacij!</string>
