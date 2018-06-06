@@ -344,6 +344,9 @@ public class MainActivity extends AppCompatActivity {
                 displayingLocations = toBeFoundLocations;
                 if (displayingLocations.isEmpty() && AppNetworkStatus.getInstance(getApplicationContext()).isOnline()){
                     info.setText(getResources().getString(R.string.infoLoading));
+                    if(!foundLocations.isEmpty()){
+                        info.setText(getResources().getString(R.string.infoFoundAll));
+                    }
                 }
                 else if(displayingLocations.isEmpty()){
                     info.setText(getResources().getString(R.string.infoNoConnection));
